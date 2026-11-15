@@ -1,0 +1,112 @@
+name: capture
+
+on:
+  workflow_dispatch:
+    inputs:
+      tarball:
+        description: "Tarball file name under https://rocm.nightlies.amd.com/tarball/"
+        type: string
+        default: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+      version_id:
+        description: "S3 object version to fetch (x-amz-version-id), so the capture is reproducible"
+        type: string
+        default: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+      expected_size:
+        description: "Expected size in bytes (content-length); the run fails on a mismatch"
+        type: string
+        default: "3317540625"
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate inputs
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          [[ "$TARBALL" =~ ^therock-dist-linux-[A-Za-z0-9._-]+\.tar\.gz$ ]] || { echo "bad tarball name"; exit 1; }
+          [[ "$VERSION_ID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad version id"; exit 1; }
+          [[ "$EXPECTED_SIZE" =~ ^[0-9]+$ ]] || { echo "bad size"; exit 1; }
+
+      - name: Download
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          url="https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$RUNNER_TEMP/sdk.tar.gz" "$url"
+          size=$(stat -c %s "$RUNNER_TEMP/sdk.tar.gz")
+          [ "$size" = "$EXPECTED_SIZE" ] || { echo "size $size != expected $EXPECTED_SIZE"; exit 1; }
+          sha256sum "$RUNNER_TEMP/sdk.tar.gz" | cut -d' ' -f1 > "$RUNNER_TEMP/sha256"
+          echo "sha256 $(cat "$RUNNER_TEMP/sha256")"
+
+      - name: List and extract
+        run: |
+          set -euo pipefail
+          tar -tzvf "$RUNNER_TEMP/sdk.tar.gz" > "$RUNNER_TEMP/listing.txt"
+          rm -rf sdk listing && mkdir -p sdk listing
+          tar -xzf "$RUNNER_TEMP/sdk.tar.gz" -C sdk --wildcards \
+            '*.pc' '*ConfigVersion.cmake' '*-config-version.cmake'
+          # Library files: name, type, size and link target only; no content.
+          grep -E '(\.so(\.[0-9]+)*|\.a|\.dylib)( -> .*)?$' "$RUNNER_TEMP/listing.txt" \
+            | awk '{ $3=""; $4=""; $5=""; print }' | sed 's/  */ /g' | LC_ALL=C sort > listing/library-files.txt
+          echo "members: $(wc -l < "$RUNNER_TEMP/listing.txt")"
+          echo "library files: $(wc -l < listing/library-files.txt)"
+
+      - name: Manifest
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          python3 -I -B - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path("sdk")
+          files = [p for p in root.rglob("*") if p.is_file() or p.is_symlink()]
+          count = lambda pred: sum(1 for p in files if pred(p.name))
+          manifest = {
+              "source": "https://rocm.nightlies.amd.com/tarball/" + os.environ["TARBALL"],
+              "s3_version_id": os.environ["VERSION_ID"],
+              "size_bytes": int(os.environ["EXPECTED_SIZE"]),
+              "sha256": open(os.environ["RUNNER_TEMP"] + "/sha256").read().strip(),
+              "capture_run_id": os.environ["RUN_ID"],
+              "members_in_tarball": sum(1 for _ in open(os.environ["RUNNER_TEMP"] + "/listing.txt")),
+              "extracted": {
+                  "pkg-config": count(lambda n: n.endswith(".pc")),
+                  "cmake-version": count(lambda n: n.endswith("ConfigVersion.cmake") or n.endswith("-config-version.cmake")),
+              },
+              "library_files_listed": sum(1 for _ in open("listing/library-files.txt")),
+          }
+          json.dump(manifest, open("MANIFEST.json", "w"), indent=2, sort_keys=True)
+          open("MANIFEST.json", "a").write("\n")
+          print(json.dumps(manifest, indent=2, sort_keys=True))
+          PY
+
+      - name: Commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARBALL: ${{ inputs.tarball }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A sdk listing MANIFEST.json
+          git diff --cached --quiet && { echo "nothing changed"; exit 0; }
+          git commit -q -m "capture: ${TARBALL}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" HEAD:main

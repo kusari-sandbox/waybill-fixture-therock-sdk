@@ -1,0 +1,104 @@
+name: measure
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref with the installed-library reader"
+        type: string
+        default: 1531-pkgconfig-cmake-versions
+      base_ref:
+        description: "waybill ref to compare against"
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.base_ref }}
+          path: base
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: branch
+
+      - name: Build both
+        run: |
+          set -euo pipefail
+          for side in base branch; do
+            (cd "$side" && cargo build --release -p waybill)
+            echo "$side $(git -C "$side" rev-parse HEAD)"
+          done
+
+      - name: Scan
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for side in base branch; do
+            for i in 1 2 3; do
+              start=$(date +%s.%N)
+              HOME="$RUNNER_TEMP/home-$side" "$side/target/release/waybill" --offline sbom scan \
+                --path fixture/sdk --no-deep-hash \
+                --format cyclonedx-json --output "cyclonedx-json=out/$side.cdx.json" 2> "out/$side.log"
+              end=$(date +%s.%N)
+              echo "$side run$i $(echo "$end - $start" | bc)" >> out/timing.txt
+            done
+          done
+
+      - name: Report
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+          BASE_REF: ${{ inputs.base_ref }}
+        run: |
+          set -euo pipefail
+          python3 -I -B - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, os, subprocess
+          def comps(d):
+              out, stack = [], list(d.get("components", []))
+              while stack:
+                  c = stack.pop(); out.append(c); stack.extend(c.get("components", []))
+              return out
+          manifest = json.load(open("fixture/MANIFEST.json"))
+          print(f"## {os.environ['WAYBILL_REF']} vs {os.environ['BASE_REF']}\n")
+          print(f"Fixture: `{manifest['source']}` sha256 `{manifest['sha256']}`; extracted {manifest['extracted']}\n")
+          print("| side | waybill commit | components | with a version | pkg:generic with a version |")
+          print("|---|---|---|---|---|")
+          for side in ["base", "branch"]:
+              d = json.load(open(f"out/{side}.cdx.json"))
+              cs = comps(d)
+              rev = subprocess.run(["git", "-C", side, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+              versioned = [c for c in cs if c.get("version")]
+              generic = [c for c in versioned if c.get("purl", "").startswith("pkg:generic/") and "file-sha256" not in c.get("purl", "")]
+              print(f"| {side} | `{rev}` | {len(cs)} | {len(versioned)} | {len(generic)} |")
+          d = json.load(open("out/branch.cdx.json"))
+          cov = [p["value"] for p in d.get("metadata", {}).get("properties", []) if p["name"] == "waybill:installed-library-coverage"]
+          print(f"\n**C225** (branch): `{cov[0] if cov else 'absent'}`\n")
+          print("Timing (seconds):\n```\n" + open("out/timing.txt").read() + "```")
+          PY
+          python3 -I -B -c "
+          import json
+          d=json.load(open('out/branch.cdx.json'))
+          for c in d.get('components',[]):
+              p=c.get('purl','')
+              if p.startswith('pkg:generic/') and 'file-sha256' not in p: print(p)
+          " | LC_ALL=C sort > out/branch-generic-purls.txt
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: measure-sboms
+          path: out/
