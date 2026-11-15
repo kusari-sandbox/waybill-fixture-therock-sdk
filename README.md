@@ -2,8 +2,9 @@
 
 The install-time metadata from one TheRock ("ROCm SDK") nightly dist tarball.
 It holds pkg-config files (`*.pc`), CMake package version files
-(`*ConfigVersion.cmake`, `*-config-version.cmake`), and a listing of the
-tarball's library files. It is a scan target for
+(`*ConfigVersion.cmake`, `*-config-version.cmake`), TheRock's own
+`share/therock/*.json` manifests, the aggregated `share/doc/NOTICES.txt`,
+and listings of the tarball's members. It is a scan target for
 [waybill](https://github.com/kusari-oss/waybill)'s installed-library reader
 (kusari-oss/waybill#1531). That reader reads these files to give an installed
 C/C++ SDK's libraries their exact versions.

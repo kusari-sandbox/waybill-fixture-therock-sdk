@@ -59,7 +59,8 @@ jobs:
           tar -tzvf "$RUNNER_TEMP/sdk.tar.gz" > "$RUNNER_TEMP/listing.txt"
           rm -rf sdk listing && mkdir -p sdk listing
           tar -xzf "$RUNNER_TEMP/sdk.tar.gz" -C sdk --wildcards \
-            '*.pc' '*ConfigVersion.cmake' '*-config-version.cmake'
+            '*.pc' '*ConfigVersion.cmake' '*-config-version.cmake' \
+            './share/therock/*.json' './share/doc/NOTICES.txt' './.info/version'
           # Library files: name, type, size and link target only; no content.
           grep -E '(\.so(\.[0-9]+)*|\.a|\.dylib)( -> .*)?$' "$RUNNER_TEMP/listing.txt" \
             | awk '{ $3=""; $4=""; $5=""; print }' | sed 's/  */ /g' | LC_ALL=C sort > listing/library-files.txt
