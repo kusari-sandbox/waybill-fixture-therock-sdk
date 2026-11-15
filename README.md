@@ -20,8 +20,9 @@ The files remain under the licences of the projects that ship them.
 ## Workflows
 
 - **`capture`** (manual): downloads one tarball, verifies its size,
-  extracts only the files above, writes `MANIFEST.json` and
-  `listing/library-files.txt`, and commits them.
+  extracts only the files above, writes `MANIFEST.json`,
+  `listing/library-files.txt` and `listing/all-files.txt` (every member's
+  type, size and path, with no content), and commits them.
 - **`measure`** (manual): builds waybill at two refs, scans `sdk/` with
   each, and reports in the run summary:
   - the number of versioned components;
