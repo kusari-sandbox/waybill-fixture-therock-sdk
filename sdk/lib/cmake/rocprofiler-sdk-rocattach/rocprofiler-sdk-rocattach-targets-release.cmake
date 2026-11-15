@@ -1,0 +1,20 @@
+#----------------------------------------------------------------
+# Generated CMake target import file for configuration "Release".
+#----------------------------------------------------------------
+
+# Commands may need to know the format version.
+set(CMAKE_IMPORT_FILE_VERSION 1)
+
+# Import target "rocprofiler-sdk::rocprofiler-sdk-rocattach-shared-library" for configuration "Release"
+set_property(TARGET rocprofiler-sdk::rocprofiler-sdk-rocattach-shared-library APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(rocprofiler-sdk::rocprofiler-sdk-rocattach-shared-library PROPERTIES
+  IMPORTED_LINK_DEPENDENT_LIBRARIES_RELEASE "rocprofiler-sdk::rocprofiler-sdk-shared-library"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/librocprofiler-sdk-rocattach.so.1.3.1"
+  IMPORTED_SONAME_RELEASE "librocprofiler-sdk-rocattach.so.1"
+  )
+
+list(APPEND _cmake_import_check_targets rocprofiler-sdk::rocprofiler-sdk-rocattach-shared-library )
+list(APPEND _cmake_import_check_files_for_rocprofiler-sdk::rocprofiler-sdk-rocattach-shared-library "${_IMPORT_PREFIX}/lib/librocprofiler-sdk-rocattach.so.1.3.1" )
+
+# Commands beyond this point should not need to know the version.
+set(CMAKE_IMPORT_FILE_VERSION)
