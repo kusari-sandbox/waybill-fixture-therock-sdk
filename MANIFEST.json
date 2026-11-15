@@ -1,7 +1,8 @@
 {
-  "capture_run_id": "43746953759",
+  "capture_run_id": "43767883366",
   "extracted": {
     "cmake-version": 84,
+    "ctest": 28,
     "pkg-config": 254
   },
   "library_files_listed": 1263,
