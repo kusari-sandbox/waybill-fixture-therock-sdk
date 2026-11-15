@@ -1,0 +1,12 @@
+prefix=/home/runner/_work/TheRock/TheRock/output/build/compiler/amd-llvm/stage/lib/llvm
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: AMDLLVMSPIRVLib
+Description: AMD SPECIFIC LLVM/SPIR-V bi-directional translator
+Version: 23.0.0.0
+URL: https://github.com/KhronosGroup/SPIRV-LLVM-Translator
+
+Libs: -L${libdir} -lLLVMSPIRVAMDLib
+Cflags: -I${includedir}

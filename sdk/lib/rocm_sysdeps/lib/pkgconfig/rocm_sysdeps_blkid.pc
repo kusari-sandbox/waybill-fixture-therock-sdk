@@ -1,0 +1,9 @@
+prefix=${pcfiledir}/../..
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: rocm_sysdeps_blkid
+Description: Block device id library
+Version: 2.42.1
+Libs: -L${libdir} -lrocm_sysdeps_blkid
+Cflags: -I${includedir}/blkid

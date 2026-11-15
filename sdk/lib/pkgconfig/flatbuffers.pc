@@ -1,0 +1,9 @@
+libdir=/home/runner/_work/TheRock/TheRock/output/build/third-party/flatbuffers/stage/lib
+includedir=/home/runner/_work/TheRock/TheRock/output/build/third-party/flatbuffers/stage/include
+
+Name: FlatBuffers
+Description: Memory Efficient Serialization Library
+Version: 25.9.23
+
+Libs: -L${libdir} -lflatbuffers
+Cflags: -I${includedir}

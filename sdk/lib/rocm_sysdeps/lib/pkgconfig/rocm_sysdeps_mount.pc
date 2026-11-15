@@ -1,0 +1,11 @@
+prefix=${pcfiledir}/../..
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: rocm_sysdeps_mount
+Description: mount library
+Version: 2.42.1
+Requires.private: rocm_sysdeps_blkid
+Libs: -L${libdir} -lrocm_sysdeps_mount
+Libs.private: -lrt
+Cflags: -I${includedir}/libmount

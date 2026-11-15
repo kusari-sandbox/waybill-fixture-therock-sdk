@@ -1,0 +1,1263 @@
+-rw-r--r-- root/root ./lib/libamd_smi_static.a
+-rw-r--r-- root/root ./lib/libamdsminic.a
+-rw-r--r-- root/root ./lib/libdevice_contraction_operations.a
+-rw-r--r-- root/root ./lib/libdevice_conv_operations.a
+-rw-r--r-- root/root ./lib/libdevice_other_operations.a
+-rw-r--r-- root/root ./lib/libdevice_reduction_operations.a
+-rw-r--r-- root/root ./lib/libflatbuffers.a
+-rw-r--r-- root/root ./lib/libhsakmt.a
+-rw-r--r-- root/root ./lib/librocshmem.a
+-rw-r--r-- root/root ./lib/libutility.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libc++.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libc++abi.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libc++experimental.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libc.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libm.a
+-rw-r--r-- root/root ./lib/llvm/lib/amdgcn-amd-amdhsa/libompdevice.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/amdgcn-amd-amdhsa/libclang_rt.builtins.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/amdgcn-amd-amdhsa/libflang_rt.openmp.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/amdgcn-amd-amdhsa/libflang_rt.runtime.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.asan-preinit-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.asan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.asan_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.asan_static-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.builtins-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.cfi-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.cfi_diag-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ctx_profile-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.dd-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.dfsan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.fuzzer-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.fuzzer_interceptors-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.fuzzer_no_main-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.gwp_asan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan-preinit-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan_aliases-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan_aliases_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.lsan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.memprof-preinit-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.memprof-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.memprof_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.msan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.msan_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.nsan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.profile-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.rtsan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.safestack-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.scudo_standalone-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.scudo_standalone_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.stats-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.stats_client-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.tsan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.tsan_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.tysan-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_loop_detect-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_minimal-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_standalone-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_standalone_cxx-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.xray-basic-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.xray-dso-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.xray-fdr-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.xray-profiling-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.xray-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/linux/liborc_rt-x86_64.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/x86_64-unknown-linux-gnu/libflang_rt.openmp.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/x86_64-unknown-linux-gnu/libflang_rt.quadmath.a
+-rw-r--r-- root/root ./lib/llvm/lib/clang/23/lib/x86_64-unknown-linux-gnu/libflang_rt.runtime.a
+-rw-r--r-- root/root ./lib/llvm/lib/libCUFAttrs.a
+-rw-r--r-- root/root ./lib/llvm/lib/libCUFDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRBuilder.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRCodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRCodeGenDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRDialectSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIROpenACCAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIROpenACCSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIROpenACCTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIROpenMPSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFIRTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFlangOpenMPTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranDecimal.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranEvaluate.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranLower.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranSemantics.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libFortranUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libHLFIRDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libHLFIRTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMABI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUAsmParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUCodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUDesc.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUDisassembler.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUInfo.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUTargetMCA.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAMDGPUUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAggressiveInstCombine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAsmParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMAsmPrinter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMBinaryFormat.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMBitReader.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMBitWriter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMBitstreamReader.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCAS.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCFGuard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCGData.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCodeGenTypes.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCore.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCoroutines.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMCoverage.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDTLTO.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDWARFCFIChecker.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDWARFLinker.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDWARFLinkerClassic.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDWARFLinkerParallel.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDWP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoBTF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoCodeView.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoDWARF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoDWARFLowLevel.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoGSYM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoLogicalView.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoMSF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebugInfoPDB.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDebuginfod.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDemangle.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMDlltoolDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMExecutionEngine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFileCheck.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendAtomic.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendDirective.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendHLSL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendOffloading.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendOpenACC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFrontendOpenMP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFuzzMutate.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMFuzzerCLI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMGlobalISel.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMHTTP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMHipStdPar.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMIRPrinter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMIRReader.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMInstCombine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMInstrumentation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMInterfaceStub.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMInterpreter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMJITLink.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMLTO.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMLibDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMLineEditor.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMLinker.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMCA.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMCDisassembler.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMCJIT.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMCParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMMIRParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMObjCARCOpts.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMObjCopy.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMObject.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMObjectYAML.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOptDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOption.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOrcDebugging.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOrcJIT.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOrcShared.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMOrcTargetProcess.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMPasses.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMPlugins.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMProfileData.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMRemarks.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMRuntimeDyld.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSPIRVAMDLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSandboxIR.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMScalarOpts.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSelectionDAG.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSupportLSP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMSymbolize.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTableGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTableGenBasic.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTableGenCommon.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTargetParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTelemetry.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTextAPI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTextAPIBinaryReader.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMTransformUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMVectorize.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMWindowsDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMWindowsManifest.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86AsmParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86CodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86Desc.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86Disassembler.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86Info.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMX86TargetMCA.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMXRay.a
+-rw-r--r-- root/root ./lib/llvm/lib/libLLVMipo.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMIFDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRABI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAMDGPUDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAMDGPUToROCDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAMDGPUTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAMDGPUUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineToStandard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAffineUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAlignmentAttrInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithAndMathToAPFloatUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithAttrToLLVMConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToAMDGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToAPFloat.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToArmSME.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArithValueBoundsOpInterfaceImpl.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmNeon2dToIntr.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmNeonDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmNeonToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmNeonTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmNeonVectorTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSMEDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSMEToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSMEToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSMEToSCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSMETransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSVEDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSVEToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSVETransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRArmSVEVectorTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAsmParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAsyncDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAsyncToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRAsyncTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationAllExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationPipelines.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationShardingExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationToMemRef.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBufferizationTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBuiltinToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBytecodeOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBytecodeReader.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRBytecodeWriter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIAMDGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIAffine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIArith.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIArmNeon.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIArmSME.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIArmSVE.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIAsync.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIBufferization.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIComplex.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIControlFlow.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIDLTI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIDebug.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIExecutionEngine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIExportSMTLIB.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIFunc.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIIR.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIIRDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIIndex.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPILLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPILinalg.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIMLProgram.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIMPI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIMath.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIMemRef.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPINVGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPINVVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIOpenACC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIOpenMP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIPDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIPDLInterp.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIPtr.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIQuant.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIROCDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIRegisterEverything.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPISCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPISMT.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPISPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIShape.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIShard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPISparseTensor.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITensor.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITosa.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITransformDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITransformDialectTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPITransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIUB.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIVCIX.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIVector.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIWasmSSA.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIX86.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIXeGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCAPIXeVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCallInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRCastInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexDivisionConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexToLibm.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexToROCDLLibraryCalls.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRComplexToStandard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowToSCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRControlFlowTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRConvertToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRConvertToLLVMInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRConvertToLLVMPass.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDLTIDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDLTITransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDataLayoutInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDebug.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDerivedAttributeOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDestinationStyleOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRDialectUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIREmitCDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIREmitCTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRExecutionEngine.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRExecutionEngineUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRExportSMTLIB.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFromLLVMIRTranslationRegistration.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncAllExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncInlinerExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncShardingExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFuncUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRFunctionInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUPipelines.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToGPURuntimeTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToLLVMSPV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToNVVMTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToROCDLTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRGPUUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIR.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIRDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIndexDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIndexToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIndexToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRIndexingMapOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRInferIntRangeCommon.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRInferIntRangeInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRInferStridedMetadataInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRInferTypeOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRJitRunner.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMCommonConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMIRToLLVMTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMIRToNVVMTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMIRTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLLVMToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLinalgDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLinalgToStandard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLinalgTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLinalgTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLinalgUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLoopLikeInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLspServerLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRLspServerSupportLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMLProgramDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMLProgramTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMPIDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMPIToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMaskableOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMaskingOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToAPFloat.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToFuncs.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToLibm.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToNVVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToROCDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathToXeVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMathTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemOpInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemRefUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemorySlotInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMemorySlotUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRMlirOptMain.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVGPUDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVGPUToNVVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVGPUTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVGPUTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVGPUUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVVMDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVVMTarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVVMToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRNVVMToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRObservers.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCMPCommon.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCToSCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenACCUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenMPDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenMPToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenMPToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenMPTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROpenMPUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIROptLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLInterpDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLLAST.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLLCodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLLODS.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPDLToPDLInterp.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRParallelCombiningOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRParser.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPass.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPluginsLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPresburger.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPtrDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPtrMemorySpaceInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPtrToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRPtrToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQuantDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQuantTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQuantUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQuery.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQueryLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRQueryMatcher.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRROCDLDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRROCDLTarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRROCDLToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRReconcileUnrealizedCasts.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRReduce.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRReduceLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRegisterAllDialects.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRegisterAllExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRegisterAllPasses.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRemarkStreamer.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRewrite.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRewritePDL.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRRuntimeVerifiableOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFToControlFlow.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFToEmitC.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFToGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFToOpenMP.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSCFUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSMT.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVAttrToLLVMConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVBinaryUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVConversion.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVDeserialization.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVImageInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVModuleCombiner.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVSerialization.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVTarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVTranslateRegistration.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSPIRVUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShapeDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShapeOpsTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShapeToStandard.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShapedOpInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShardDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShardToMPI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShardTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRShardingInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSideEffectInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorPipelines.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorRuntime.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSparseTensorUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSubsetOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTableGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetCpp.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetIRDLToCpp.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetLLVMIRExport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetLLVMIRImport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetLLVMIRTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTargetWasmImport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTblgenLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorAllExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorInferTypeOpInterfaceImpl.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorShardingExtensions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorTilingInterfaceImpl.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorToLinalg.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTensorUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTilingInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRToLLVMIRTranslationRegistration.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaShardingInterfaceImpl.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaToArith.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaToLinalg.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaToMLProgram.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaToSCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaToTensor.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTosaTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDebugExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDialectIRDLExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDialectInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDialectTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformDialectUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformLoopExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformPDLExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformSMTExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformTuneExtension.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransformUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRTranslateLib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRUBDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRUBToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRUBToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVCIXDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVCIXToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRValueBoundsOpInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorInterfaces.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToAMX.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToArmSME.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToLLVMPass.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToSCF.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToSPIRV.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorToXeGPU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRVectorUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRViewLikeInterface.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRWasmSSADialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRX86Dialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRX86TransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRX86Transforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRX86Utils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeGPUDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeGPUToXeVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeGPUTransformOps.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeGPUTransforms.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeGPUUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeVMDialect.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeVMTarget.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeVMToLLVM.a
+-rw-r--r-- root/root ./lib/llvm/lib/libMLIRXeVMToLLVMIRTranslation.a
+-rw-r--r-- root/root ./lib/llvm/lib/libarcher_static.a
+-rw-r--r-- root/root ./lib/llvm/lib/libc++abi.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAPINotes.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAST.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangASTMatchers.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAnalysis.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAnalysisFlowSensitive.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAnalysisFlowSensitiveModels.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangAnalysisLifetimeSafety.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangApplyReplacements.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangBasic.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangChangeNamespace.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangCodeGen.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangCrossTU.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDependencyScanning.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDirectoryWatcher.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDoc.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDocSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDriver.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangDynamicASTMatchers.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangEdit.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangExtractAPI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangFormat.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangFrontend.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangFrontendTool.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangIncludeCleaner.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangIncludeFixer.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangIncludeFixerPlugin.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangIndex.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangIndexSerialization.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangInstallAPI.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangInterpreter.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangLex.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangMove.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangOptions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangParse.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangQuery.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangReorderFields.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangRewrite.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangRewriteFrontend.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangScalableStaticAnalysisFrameworkAnalyses.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangScalableStaticAnalysisFrameworkCore.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangScalableStaticAnalysisFrameworkFrontend.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangScalableStaticAnalysisFrameworkTool.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangSema.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangSerialization.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangStaticAnalyzerCheckers.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangStaticAnalyzerCore.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangStaticAnalyzerFrontend.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangSupport.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidy.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyAbseilModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyAlteraModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyAndroidModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyBoostModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyBugproneModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyCERTModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyConcurrencyModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyCppCoreGuidelinesModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyDarwinModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyFuchsiaModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyGoogleModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyHICPPModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyLLVMLibcModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyLLVMModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyLinuxKernelModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyMain.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyMiscModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyModernizeModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyObjCModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyOpenMPModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyPerformanceModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyPlugin.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyPortabilityModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyReadabilityModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyUtils.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTidyZirconModule.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTooling.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingASTDiff.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingCore.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingInclusions.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingInclusionsStdlib.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingRefactoring.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangToolingSyntax.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangTransformer.a
+-rw-r--r-- root/root ./lib/llvm/lib/libclangUnifiedSymbolResolution.a
+-rw-r--r-- root/root ./lib/llvm/lib/libfindAllSymbols.a
+-rw-r--r-- root/root ./lib/llvm/lib/libflangFrontend.a
+-rw-r--r-- root/root ./lib/llvm/lib/libflangFrontendTool.a
+-rw-r--r-- root/root ./lib/llvm/lib/libflangPasses.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldCOFF.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldCommon.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldELF.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldMachO.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldMinGW.a
+-rw-r--r-- root/root ./lib/llvm/lib/liblldWasm.a
+-rw-r--r-- root/root ./lib/llvm/lib/libunwind.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_base.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_city.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_civil_time.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cord.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cord_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cordz_functions.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cordz_handle.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cordz_info.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_cordz_sample_token.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_crc32c.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_crc_cord_state.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_crc_cpu_detect.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_crc_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_debugging_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_decode_rust_punycode.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_demangle_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_demangle_rust.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_die_if_null.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_examine_stack.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_exponential_biased.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_failure_signal_handler.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_commandlineflag.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_commandlineflag_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_config.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_marshalling.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_parse.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_private_handle_accessor.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_program_name.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_reflection.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_usage.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_flags_usage_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_graphcycles_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_hash.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_hashtablez_sampler.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_int128.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_kernel_timeout_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_leak_check.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_flags.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_globals.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_initialize.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_check_op.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_conditions.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_fnmatch.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_format.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_globals.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_log_sink_set.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_message.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_nullguard.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_proto.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_internal_structured_proto.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_severity.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_log_sink.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_low_level_hash.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_malloc_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_periodic_sampler.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_poison.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_distributions.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_distribution_test_util.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_entropy_pool.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_platform.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_randen.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_randen_hwaes.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_randen_hwaes_impl.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_randen_slow.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_internal_seed_material.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_seed_gen_exception.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_random_seed_sequences.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_raw_hash_set.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_raw_logging_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_scoped_set_env.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_spinlock_wait.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_stacktrace.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_status.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_statusor.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_str_format_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_strerror.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_string_view.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_strings.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_strings_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_symbolize.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_synchronization.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_throw_delegate.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_time.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_time_zone.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_tracing_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_utf8_for_code_point.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libabsl_vlog_config_internal.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libaddress_sorting.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libcares.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libcrypto.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgpr.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc++.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc++_alts.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc++_error_details.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc++_reflection.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc++_unsecure.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc_authorization_provider.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc_plugin_support.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpc_unsecure.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libgrpcpp_channelz.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libprotobuf-lite.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libprotobuf.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libprotoc.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libre2.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libssl.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_base_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_hash_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_json_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_lex_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_mem_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_message_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_mini_descriptor_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_mini_table_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_reflection_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_textformat_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libupb_wire_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libutf8_range.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libutf8_range_lib.a
+-rw-r--r-- root/root ./lib/rdc/grpc/lib/libutf8_validity.a
+-rw-r--r-- root/root ./lib/rocm_sysdeps/lib/libbacktrace.a
+-rw-r--r-- root/root ./lib/rocm_sysdeps/lib/libcap.a
+-rw-r--r-- root/root ./lib/rocm_sysdeps/lib/libpsx.a
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libpfm.so.4.13.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libtbb.so.12.17
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libtbbmalloc.so.2.17
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libtbbmalloc_proxy.so.2.17
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-coredump.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-coredump.so.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-coredump.so.0.0.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-generic.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-ptrace.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-ptrace.so.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-ptrace.so.0.0.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-setjmp.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-setjmp.so.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-setjmp.so.0.0.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-x86_64.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-x86_64.so.99
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind-x86_64.so.99.0.0
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind.so
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind.so.99
+-rw-r--r-- root/root ./lib/rocprofiler-systems/libunwind.so.99.0.0
+-rw-r--r-- root/root ./lib/rocrtst/lib/libhwloc.so.5
+-rw-r--r-- root/root ./share/amd_smi/amdsmi/libamd_smi.so
+-rw-r--r-- root/root ./share/hipblaslt/tensilelite/rocisa/libstinkytofu.so.0.1.0
+-rwxr-xr-x root/root ./lib/hipdnn_plugins/engines/libhip_kernel_provider.so
+-rwxr-xr-x root/root ./lib/hipdnn_plugins/engines/libhipblaslt_plugin.so
+-rwxr-xr-x root/root ./lib/hipdnn_plugins/engines/libmiopen_plugin.so
+-rwxr-xr-x root/root ./lib/host-math/lib/libamd.so.3.3.3
+-rwxr-xr-x root/root ./lib/host-math/lib/libcamd.so.3.3.3
+-rwxr-xr-x root/root ./lib/host-math/lib/libccolamd.so.3.3.4
+-rwxr-xr-x root/root ./lib/host-math/lib/libcholmod.so.5.3.0
+-rwxr-xr-x root/root ./lib/host-math/lib/libcolamd.so.3.3.4
+-rwxr-xr-x root/root ./lib/host-math/lib/librocm-openblas.so.0.3
+-rwxr-xr-x root/root ./lib/host-math/lib/librocm-openblas64.so.0.3
+-rwxr-xr-x root/root ./lib/host-math/lib/libsuitesparseconfig.so.7.8.3
+-rwxr-xr-x root/root ./lib/libMIOpen.so.1.0
+-rwxr-xr-x root/root ./lib/libMIOpenCKGroupedConv_gfx1150.so
+-rwxr-xr-x root/root ./lib/libOpenCL.so.1.2
+-rwxr-xr-x root/root ./lib/libamd_comgr.so.3.3.0
+-rwxr-xr-x root/root ./lib/libamd_smi.so.26.5.0
+-rwxr-xr-x root/root ./lib/libcltrace.so
+-rwxr-xr-x root/root ./lib/libfftw3.so.3
+-rwxr-xr-x root/root ./lib/libfftw3_threads.so.3
+-rwxr-xr-x root/root ./lib/libfftw3f.so.3
+-rwxr-xr-x root/root ./lib/libfftw3f_threads.so.3
+-rwxr-xr-x root/root ./lib/libgoamdsmi_shim64.so.1.0
+-rwxr-xr-x root/root ./lib/libhipblas.so.3.5
+-rwxr-xr-x root/root ./lib/libhipblaslt.so.1.4
+-rwxr-xr-x root/root ./lib/libhipdnn_backend.so
+-rwxr-xr-x root/root ./lib/libhipfft.so.0.1
+-rwxr-xr-x root/root ./lib/libhipfftw.so.0.1
+-rwxr-xr-x root/root ./lib/libhiprand.so.1.1
+-rwxr-xr-x root/root ./lib/libhipsolver.so.1.2
+-rwxr-xr-x root/root ./lib/libhipsolver_fortran.so.1.2
+-rwxr-xr-x root/root ./lib/libhipsparse.so.4.6.0
+-rwxr-xr-x root/root ./lib/libhipsparselt.so.0.2
+-rwxr-xr-x root/root ./lib/libhsa-amd-aqlprofile64.so
+-rwxr-xr-x root/root ./lib/libhsa-amd-aqlprofile64.so.1.0.0
+-rwxr-xr-x root/root ./lib/libhsa-runtime64.so.1.21.0
+-rwxr-xr-x root/root ./lib/liboam.so.1.0
+-rwxr-xr-x root/root ./lib/librccl.so.1.0
+-rwxr-xr-x root/root ./lib/librdc.so.1.3
+-rwxr-xr-x root/root ./lib/librdc_bootstrap.so.1.3
+-rwxr-xr-x root/root ./lib/librdc_client.so.1.3
+-rwxr-xr-x root/root ./lib/librocblas.so.5.5
+-rwxr-xr-x root/root ./lib/librocdecode.so.1.8.0
+-rwxr-xr-x root/root ./lib/librocfft.so.0.1
+-rwxr-xr-x root/root ./lib/librocjitsu_kmd.so
+-rwxr-xr-x root/root ./lib/librocjpeg.so.1.6.0
+-rwxr-xr-x root/root ./lib/librocm-core.so.1.0.71400
+-rwxr-xr-x root/root ./lib/librocm-dbgapi.so.0.80.0
+-rwxr-xr-x root/root ./lib/librocm-debug-agent.so.2.1.0
+-rwxr-xr-x root/root ./lib/librocm_kpack.so.0.1.0
+-rwxr-xr-x root/root ./lib/librocm_smi64.so.1.0
+-rwxr-xr-x root/root ./lib/librocprof-sys-dl.so.1.7.0
+-rwxr-xr-x root/root ./lib/librocprof-sys-rt.so.1.7.0
+-rwxr-xr-x root/root ./lib/librocprof-sys-user.so.1.7.0
+-rwxr-xr-x root/root ./lib/librocprof-sys.so.1.7.0
+-rwxr-xr-x root/root ./lib/librocprof-trace-decoder.so.0.2.0
+-rwxr-xr-x root/root ./lib/librocprofiler-register.so.0.6.0
+-rwxr-xr-x root/root ./lib/librocprofiler-sdk-attach.so.1.3.1
+-rwxr-xr-x root/root ./lib/librocprofiler-sdk-rocattach.so.1.3.1
+-rwxr-xr-x root/root ./lib/librocprofiler-sdk-rocpd.so.1.3.1
+-rwxr-xr-x root/root ./lib/librocprofiler-sdk-roctx.so.1.3.1
+-rwxr-xr-x root/root ./lib/librocprofiler-sdk.so.1.3.1
+-rwxr-xr-x root/root ./lib/librocrand.so.1.1
+-rwxr-xr-x root/root ./lib/librocroller.so.1.0.0
+-rwxr-xr-x root/root ./lib/librocsolver.so.0.10
+-rwxr-xr-x root/root ./lib/librocsparse.so.1.0
+-rwxr-xr-x root/root ./lib/libroctracer64.so.4.1.0
+-rwxr-xr-x root/root ./lib/libroctx64.so.4.1.0
+-rwxr-xr-x root/root ./lib/libtest_linking_lib1.so
+-rwxr-xr-x root/root ./lib/libtest_linking_lib2.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.asan-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.dyndd-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.hwasan_aliases-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.memprof-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.nsan-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.scudo_standalone-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.tsan-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_minimal-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/clang/23/lib/linux/libclang_rt.ubsan_standalone-x86_64.so
+-rwxr-xr-x root/root ./lib/llvm/lib/libarcher.so
+-rwxr-xr-x root/root ./lib/llvm/lib/libomp.so
+-rwxr-xr-x root/root ./lib/llvm/lib/libunwind.so.1.0
+-rwxr-xr-x root/root ./lib/python/site-packages/rocprofsys/libpyrocprofsys.cpython-310-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python/site-packages/rocprofsys/libpyrocprofsys.cpython-311-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python/site-packages/rocprofsys/libpyrocprofsys.cpython-312-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python/site-packages/rocprofsys/libpyrocprofsys.cpython-313-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.10/site-packages/rocpd/libpyrocpd.cpython-310-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.10/site-packages/roctx/libpyroctx.cpython-310-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.11/site-packages/rocpd/libpyrocpd.cpython-311-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.11/site-packages/roctx/libpyroctx.cpython-311-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.12/site-packages/rocpd/libpyrocpd.cpython-312-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.12/site-packages/roctx/libpyroctx.cpython-312-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.13/site-packages/rocpd/libpyrocpd.cpython-313-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/python3.13/site-packages/roctx/libpyroctx.cpython-313-x86_64-linux-gnu.so
+-rwxr-xr-x root/root ./lib/rdc/grpc/lib/rocm_sysdeps/lib/librocm_sysdeps_z.so.1.3.2
+-rwxr-xr-x root/root ./lib/rdc/librdc_rocp.so.1.3
+-rwxr-xr-x root/root ./lib/rdc/librdc_rocr.so.1.3
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_asm.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_blkid.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_bz2.so
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_cap.so.2
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_drm.so.2
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_drm_amdgpu.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_dw.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_elf.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_expat.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_formw.so.6
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_gallium_drv_video.so
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_gmp.so.10
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_hwloc.so.5
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_liblzma.so.5.8.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_menuw.so.6
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_mnl.so.0
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_mount.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_mpfr.so.6
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_ncursesw.so.6
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_genl_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_idiag_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_nf_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_route_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_nl_xfrm_3.so.200
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_numa.so.1
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_panelw.so.6
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_pciaccess.so.0
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_psx.so.2
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_sqlite3.so
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va-drm.so.2.2200.0
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va.so.2.2200.0
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_z.so.1.3.2
+-rwxr-xr-x root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_zstd.so.1.5.7
+-rwxr-xr-x root/root ./lib/rocprofiler-compute/librocprofiler-compute-tool.so
+-rwxr-xr-x root/root ./lib/rocprofiler-sdk/libgotcha.so.3.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool-kokkosp.so.1.3.1
+-rwxr-xr-x root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool.so.1.3.1
+-rwxr-xr-x root/root ./lib/rocprofiler-sdk/librocprofv3-list-avail.so.1.3.1
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libcommon.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libdynDwarf.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libdynElf.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libdyninstAPI.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libgotcha.so.2.4.2
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libinstructionAPI.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libparseAPI.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libpatchAPI.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libpcontrol.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libstackwalk.so.13.0.0
+-rwxr-xr-x root/root ./lib/rocprofiler-systems/libsymtabAPI.so.13.0.0
+-rwxr-xr-x root/root ./lib/roctracer/libfile_plugin.so
+-rwxr-xr-x root/root ./lib/roctracer/libhip_stats.so
+-rwxr-xr-x root/root ./lib/roctracer/libroctracer_tool.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_bad_api_version_heuristic_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_duplicate_id_a_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_duplicate_id_b_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_duplicate_policy_id_a_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_duplicate_policy_id_b_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_empty_name_heuristic_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_execute_fails_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_good_heuristic_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_good_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_incompatible_version_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_incomplete_api_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_incomplete_heuristic_api_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_knob_constraint_validation_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_knobs_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_malformed_version_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_no_applicable_engines_a_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_no_applicable_engines_b_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_no_optional_heuristic_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_override_implementing_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_override_omitting_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_second_override_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_version_liar_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/custom/libtest_version_zero_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/default/libtest_good_default_plugin.so
+-rwxr-xr-x root/root ./lib/test_plugins/libhipdnn_test_no_api_version_plugin_name.so
+-rwxr-xr-x root/root ./lib/test_plugins/libhipdnn_test_plugin1.so
+-rwxr-xr-x root/root ./lib/test_plugins/libhipdnn_test_plugin2.so
+-rwxr-xr-x root/root ./share/hipblaslt/tensilelite/rocisa/_rocisa.abi3.so
+-rwxr-xr-x root/root ./share/opencl/ocltst/liboclperf.so
+-rwxr-xr-x root/root ./share/opencl/ocltst/liboclruntime.so
+-rwxr-xr-x root/root ./share/rdc/rdctst_tests/libgtest.so.1.14.0
+-rwxr-xr-x root/root ./share/rdc/rdctst_tests/libgtest_main.so.1.14.0
+-rwxr-xr-x root/root ./share/roctracer/test/libcodeobj_test.so
+lrwxrwxrwx root/root ./lib/host-math/lib/libamd.so -> libamd.so.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libamd.so.3 -> libamd.so.3.3.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libcamd.so -> libcamd.so.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libcamd.so.3 -> libcamd.so.3.3.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libccolamd.so -> libccolamd.so.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libccolamd.so.3 -> libccolamd.so.3.3.4
+lrwxrwxrwx root/root ./lib/host-math/lib/libcholmod.so -> libcholmod.so.5
+lrwxrwxrwx root/root ./lib/host-math/lib/libcholmod.so.5 -> libcholmod.so.5.3.0
+lrwxrwxrwx root/root ./lib/host-math/lib/libcolamd.so -> libcolamd.so.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libcolamd.so.3 -> libcolamd.so.3.3.4
+lrwxrwxrwx root/root ./lib/host-math/lib/librocm-openblas.so -> librocm-openblas.so.0
+lrwxrwxrwx root/root ./lib/host-math/lib/librocm-openblas.so.0 -> librocm-openblas.so.0.3
+lrwxrwxrwx root/root ./lib/host-math/lib/librocm-openblas64.so -> librocm-openblas64.so.0
+lrwxrwxrwx root/root ./lib/host-math/lib/librocm-openblas64.so.0 -> librocm-openblas64.so.0.3
+lrwxrwxrwx root/root ./lib/host-math/lib/libsuitesparseconfig.so -> libsuitesparseconfig.so.7
+lrwxrwxrwx root/root ./lib/host-math/lib/libsuitesparseconfig.so.7 -> libsuitesparseconfig.so.7.8.3
+lrwxrwxrwx root/root ./lib/libMIOpen.so -> libMIOpen.so.1
+lrwxrwxrwx root/root ./lib/libMIOpen.so.1 -> libMIOpen.so.1.0
+lrwxrwxrwx root/root ./lib/libOpenCL.so -> libOpenCL.so.1
+lrwxrwxrwx root/root ./lib/libOpenCL.so.1 -> libOpenCL.so.1.2
+lrwxrwxrwx root/root ./lib/libamd_comgr.so -> libamd_comgr.so.3
+lrwxrwxrwx root/root ./lib/libamd_comgr.so.3 -> libamd_comgr.so.3.3.0
+lrwxrwxrwx root/root ./lib/libamd_smi.so -> libamd_smi.so.26
+lrwxrwxrwx root/root ./lib/libamd_smi.so.26 -> libamd_smi.so.26.5.0
+lrwxrwxrwx root/root ./lib/libamdhip64.so -> libamdhip64.so.7
+lrwxrwxrwx root/root ./lib/libamdhip64.so.7 -> libamdhip64.so.7.14.60850-1b2a555677
+lrwxrwxrwx root/root ./lib/libfftw3.so -> libfftw3.so.3.6.9
+lrwxrwxrwx root/root ./lib/libfftw3.so.3.6.9 -> libfftw3.so.3
+lrwxrwxrwx root/root ./lib/libfftw3_threads.so -> libfftw3_threads.so.3.6.9
+lrwxrwxrwx root/root ./lib/libfftw3_threads.so.3.6.9 -> libfftw3_threads.so.3
+lrwxrwxrwx root/root ./lib/libfftw3f.so -> libfftw3f.so.3.6.9
+lrwxrwxrwx root/root ./lib/libfftw3f.so.3.6.9 -> libfftw3f.so.3
+lrwxrwxrwx root/root ./lib/libfftw3f_threads.so -> libfftw3f_threads.so.3.6.9
+lrwxrwxrwx root/root ./lib/libfftw3f_threads.so.3.6.9 -> libfftw3f_threads.so.3
+lrwxrwxrwx root/root ./lib/libgoamdsmi_shim64.so -> libgoamdsmi_shim64.so.1
+lrwxrwxrwx root/root ./lib/libgoamdsmi_shim64.so.1 -> libgoamdsmi_shim64.so.1.0
+lrwxrwxrwx root/root ./lib/libhipblas.so -> libhipblas.so.3
+lrwxrwxrwx root/root ./lib/libhipblas.so.3 -> libhipblas.so.3.5
+lrwxrwxrwx root/root ./lib/libhipblaslt.so -> libhipblaslt.so.1
+lrwxrwxrwx root/root ./lib/libhipblaslt.so.1 -> libhipblaslt.so.1.4
+lrwxrwxrwx root/root ./lib/libhipfft.so -> libhipfft.so.0
+lrwxrwxrwx root/root ./lib/libhipfft.so.0 -> libhipfft.so.0.1
+lrwxrwxrwx root/root ./lib/libhipfftw.so -> libhipfftw.so.0
+lrwxrwxrwx root/root ./lib/libhipfftw.so.0 -> libhipfftw.so.0.1
+lrwxrwxrwx root/root ./lib/libhiprand.so -> libhiprand.so.1
+lrwxrwxrwx root/root ./lib/libhiprand.so.1 -> libhiprand.so.1.1
+lrwxrwxrwx root/root ./lib/libhiprtc-builtins.so -> libhiprtc-builtins.so.7
+lrwxrwxrwx root/root ./lib/libhiprtc-builtins.so.7 -> libhiprtc-builtins.so.7.14.60850-1b2a555677
+lrwxrwxrwx root/root ./lib/libhiprtc.so -> libhiprtc.so.7
+lrwxrwxrwx root/root ./lib/libhiprtc.so.7 -> libhiprtc.so.7.14.60850-1b2a555677
+lrwxrwxrwx root/root ./lib/libhipsolver.so -> libhipsolver.so.1
+lrwxrwxrwx root/root ./lib/libhipsolver.so.1 -> libhipsolver.so.1.2
+lrwxrwxrwx root/root ./lib/libhipsolver_fortran.so -> libhipsolver_fortran.so.1
+lrwxrwxrwx root/root ./lib/libhipsolver_fortran.so.1 -> libhipsolver_fortran.so.1.2
+lrwxrwxrwx root/root ./lib/libhipsparse.so -> libhipsparse.so.4
+lrwxrwxrwx root/root ./lib/libhipsparse.so.4 -> libhipsparse.so.4.6.0
+lrwxrwxrwx root/root ./lib/libhipsparselt.so -> libhipsparselt.so.0
+lrwxrwxrwx root/root ./lib/libhipsparselt.so.0 -> libhipsparselt.so.0.2
+lrwxrwxrwx root/root ./lib/libhsa-amd-aqlprofile64.so.1 -> libhsa-amd-aqlprofile64.so.1.0.0
+lrwxrwxrwx root/root ./lib/libhsa-runtime64.so -> libhsa-runtime64.so.1
+lrwxrwxrwx root/root ./lib/libhsa-runtime64.so.1 -> libhsa-runtime64.so.1.21.0
+lrwxrwxrwx root/root ./lib/liboam.so -> liboam.so.1
+lrwxrwxrwx root/root ./lib/liboam.so.1 -> liboam.so.1.0
+lrwxrwxrwx root/root ./lib/librccl.so -> librccl.so.1
+lrwxrwxrwx root/root ./lib/librccl.so.1 -> librccl.so.1.0
+lrwxrwxrwx root/root ./lib/librdc.so -> librdc.so.1
+lrwxrwxrwx root/root ./lib/librdc.so.1 -> librdc.so.1.3
+lrwxrwxrwx root/root ./lib/librdc_bootstrap.so -> librdc_bootstrap.so.1
+lrwxrwxrwx root/root ./lib/librdc_bootstrap.so.1 -> librdc_bootstrap.so.1.3
+lrwxrwxrwx root/root ./lib/librdc_client.so -> librdc_client.so.1
+lrwxrwxrwx root/root ./lib/librdc_client.so.1 -> librdc_client.so.1.3
+lrwxrwxrwx root/root ./lib/librocblas.so -> librocblas.so.5
+lrwxrwxrwx root/root ./lib/librocblas.so.5 -> librocblas.so.5.5
+lrwxrwxrwx root/root ./lib/librocdecode.so -> librocdecode.so.1
+lrwxrwxrwx root/root ./lib/librocdecode.so.1 -> librocdecode.so.1.8.0
+lrwxrwxrwx root/root ./lib/librocfft.so -> librocfft.so.0
+lrwxrwxrwx root/root ./lib/librocfft.so.0 -> librocfft.so.0.1
+lrwxrwxrwx root/root ./lib/librocjpeg.so -> librocjpeg.so.1
+lrwxrwxrwx root/root ./lib/librocjpeg.so.1 -> librocjpeg.so.1.6.0
+lrwxrwxrwx root/root ./lib/librocm-core.so -> librocm-core.so.1
+lrwxrwxrwx root/root ./lib/librocm-core.so.1 -> librocm-core.so.1.0.71400
+lrwxrwxrwx root/root ./lib/librocm-dbgapi.so -> librocm-dbgapi.so.0
+lrwxrwxrwx root/root ./lib/librocm-dbgapi.so.0 -> librocm-dbgapi.so.0.80.0
+lrwxrwxrwx root/root ./lib/librocm-debug-agent.so -> librocm-debug-agent.so.2
+lrwxrwxrwx root/root ./lib/librocm-debug-agent.so.2 -> librocm-debug-agent.so.2.1.0
+lrwxrwxrwx root/root ./lib/librocm_kpack.so -> librocm_kpack.so.0
+lrwxrwxrwx root/root ./lib/librocm_kpack.so.0 -> librocm_kpack.so.0.1.0
+lrwxrwxrwx root/root ./lib/librocm_smi64.so -> librocm_smi64.so.1
+lrwxrwxrwx root/root ./lib/librocm_smi64.so.1 -> librocm_smi64.so.1.0
+lrwxrwxrwx root/root ./lib/librocprof-sys-dl.so -> librocprof-sys-dl.so.1
+lrwxrwxrwx root/root ./lib/librocprof-sys-dl.so.1 -> librocprof-sys-dl.so.1.7.0
+lrwxrwxrwx root/root ./lib/librocprof-sys-rt.so -> librocprof-sys-rt.so.1
+lrwxrwxrwx root/root ./lib/librocprof-sys-rt.so.1 -> librocprof-sys-rt.so.1.7.0
+lrwxrwxrwx root/root ./lib/librocprof-sys-user.so -> librocprof-sys-user.so.1
+lrwxrwxrwx root/root ./lib/librocprof-sys-user.so.1 -> librocprof-sys-user.so.1.7.0
+lrwxrwxrwx root/root ./lib/librocprof-sys.so -> librocprof-sys.so.1
+lrwxrwxrwx root/root ./lib/librocprof-sys.so.1 -> librocprof-sys.so.1.7.0
+lrwxrwxrwx root/root ./lib/librocprof-trace-decoder.so -> librocprof-trace-decoder.so.0.2
+lrwxrwxrwx root/root ./lib/librocprof-trace-decoder.so.0.2 -> librocprof-trace-decoder.so.0.2.0
+lrwxrwxrwx root/root ./lib/librocprofiler-register.so -> librocprofiler-register.so.0
+lrwxrwxrwx root/root ./lib/librocprofiler-register.so.0 -> librocprofiler-register.so.0.6.0
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-attach.so -> librocprofiler-sdk-attach.so.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-attach.so.1 -> librocprofiler-sdk-attach.so.1.3.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-rocattach.so -> librocprofiler-sdk-rocattach.so.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-rocattach.so.1 -> librocprofiler-sdk-rocattach.so.1.3.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-rocpd.so -> librocprofiler-sdk-rocpd.so.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-rocpd.so.1 -> librocprofiler-sdk-rocpd.so.1.3.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-roctx.so -> librocprofiler-sdk-roctx.so.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk-roctx.so.1 -> librocprofiler-sdk-roctx.so.1.3.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk.so -> librocprofiler-sdk.so.1
+lrwxrwxrwx root/root ./lib/librocprofiler-sdk.so.1 -> librocprofiler-sdk.so.1.3.1
+lrwxrwxrwx root/root ./lib/librocrand.so -> librocrand.so.1
+lrwxrwxrwx root/root ./lib/librocrand.so.1 -> librocrand.so.1.1
+lrwxrwxrwx root/root ./lib/librocroller.so -> librocroller.so.1
+lrwxrwxrwx root/root ./lib/librocroller.so.1 -> librocroller.so.1.0.0
+lrwxrwxrwx root/root ./lib/librocsolver.so -> librocsolver.so.0
+lrwxrwxrwx root/root ./lib/librocsolver.so.0 -> librocsolver.so.0.10
+lrwxrwxrwx root/root ./lib/librocsparse.so -> librocsparse.so.1
+lrwxrwxrwx root/root ./lib/librocsparse.so.1 -> librocsparse.so.1.0
+lrwxrwxrwx root/root ./lib/libroctracer64.so -> libroctracer64.so.4
+lrwxrwxrwx root/root ./lib/libroctracer64.so.4 -> libroctracer64.so.4.1.0
+lrwxrwxrwx root/root ./lib/libroctx64.so -> libroctx64.so.4
+lrwxrwxrwx root/root ./lib/libroctx64.so.4 -> libroctx64.so.4.1.0
+lrwxrwxrwx root/root ./lib/llvm/lib/libLLVM-23git.so -> libLLVM.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libLLVM.so -> libLLVM.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libLLVMOffload.so -> libLLVMOffload.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libMLIR.so -> libMLIR.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libMLIRExecutionEngineShared.so -> libMLIRExecutionEngineShared.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libclang-cpp.so -> libclang-cpp.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libclang.so -> libclang.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libgomp.so -> libomp.so
+lrwxrwxrwx root/root ./lib/llvm/lib/libgomp.so.1 -> libomp.so
+lrwxrwxrwx root/root ./lib/llvm/lib/libiomp5.so -> libomp.so
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_apfloat_wrappers.so -> libmlir_apfloat_wrappers.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_arm_runner_utils.so -> libmlir_arm_runner_utils.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_arm_sme_abi_stubs.so -> libmlir_arm_sme_abi_stubs.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_async_runtime.so -> libmlir_async_runtime.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_c_runner_utils.so -> libmlir_c_runner_utils.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_float16_utils.so -> libmlir_float16_utils.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libmlir_runner_utils.so -> libmlir_runner_utils.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libomptarget.so -> libomptarget.so.23.0git
+lrwxrwxrwx root/root ./lib/llvm/lib/libunwind.so -> libunwind.so.1
+lrwxrwxrwx root/root ./lib/llvm/lib/libunwind.so.1 -> libunwind.so.1.0
+lrwxrwxrwx root/root ./lib/opencl/libamdocl64.so -> libamdocl64.so.2
+lrwxrwxrwx root/root ./lib/opencl/libamdocl64.so.2 -> libamdocl64.so.
+lrwxrwxrwx root/root ./lib/rdc/grpc/lib/rocm_sysdeps/lib/librocm_sysdeps_z.so.1 -> librocm_sysdeps_z.so.1.3.2
+lrwxrwxrwx root/root ./lib/rdc/grpc/lib/rocm_sysdeps/lib/libz.so -> librocm_sysdeps_z.so.1
+lrwxrwxrwx root/root ./lib/rdc/librdc_rocp.so -> librdc_rocp.so.1
+lrwxrwxrwx root/root ./lib/rdc/librdc_rocp.so.1 -> librdc_rocp.so.1.3
+lrwxrwxrwx root/root ./lib/rdc/librdc_rocr.so -> librdc_rocr.so.1
+lrwxrwxrwx root/root ./lib/rdc/librdc_rocr.so.1 -> librdc_rocr.so.1.3
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libasm.so -> librocm_sysdeps_asm.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libblkid.so -> librocm_sysdeps_blkid.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libbz2.so -> librocm_sysdeps_bz2.so
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libcap.so -> librocm_sysdeps_cap.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libdrm.so -> librocm_sysdeps_drm.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libdrm_amdgpu.so -> librocm_sysdeps_drm_amdgpu.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libdw.so -> librocm_sysdeps_dw.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libelf.so -> librocm_sysdeps_elf.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libexpat.so -> librocm_sysdeps_expat.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libformw.so -> librocm_sysdeps_formw.so.6
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libgallium_drv_video.so -> librocm_sysdeps_gallium_drv_video.so
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libgmp.so -> librocm_sysdeps_gmp.so.10
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libhwloc.so -> librocm_sysdeps_hwloc.so.5
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/liblzma.so -> librocm_sysdeps_liblzma.so.5
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libmenuw.so -> librocm_sysdeps_menuw.so.6
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libmnl.so -> librocm_sysdeps_mnl.so.0
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libmount.so -> librocm_sysdeps_mount.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libmpfr.so -> librocm_sysdeps_mpfr.so.6
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libncursesw.so -> librocm_sysdeps_ncursesw.so.6
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-3.so -> librocm_sysdeps_nl_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-genl-3.so -> librocm_sysdeps_nl_genl_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-idiag-3.so -> librocm_sysdeps_nl_idiag_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-nf-3.so -> librocm_sysdeps_nl_nf_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-route-3.so -> librocm_sysdeps_nl_route_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnl-xfrm-3.so -> librocm_sysdeps_nl_xfrm_3.so.200
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libnuma.so -> librocm_sysdeps_numa.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libpanelw.so -> librocm_sysdeps_panelw.so.6
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libpciaccess.so -> librocm_sysdeps_pciaccess.so.0
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libpsx.so -> librocm_sysdeps_psx.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_liblzma.so.5 -> librocm_sysdeps_liblzma.so.5.8.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va-drm.so -> librocm_sysdeps_va-drm.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va-drm.so.2 -> librocm_sysdeps_va-drm.so.2.2200.0
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va.so -> librocm_sysdeps_va.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_va.so.2 -> librocm_sysdeps_va.so.2.2200.0
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_z.so.1 -> librocm_sysdeps_z.so.1.3.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/librocm_sysdeps_zstd.so.1 -> librocm_sysdeps_zstd.so.1.5.7
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libsqlite3.so -> librocm_sysdeps_sqlite3.so
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libva-drm.so -> librocm_sysdeps_va-drm.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libva.so -> librocm_sysdeps_va.so.2
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libz.so -> librocm_sysdeps_z.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/libzstd.so -> librocm_sysdeps_zstd.so.1
+lrwxrwxrwx root/root ./lib/rocm_sysdeps/lib/radeonsi_drv_video.so -> librocm_sysdeps_gallium_drv_video.so
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/libgotcha.so -> libgotcha.so.3
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/libgotcha.so.3 -> libgotcha.so.3.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool-kokkosp.so -> librocprofiler-sdk-tool-kokkosp.so.1
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool-kokkosp.so.1 -> librocprofiler-sdk-tool-kokkosp.so.1.3.1
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool.so -> librocprofiler-sdk-tool.so.1
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofiler-sdk-tool.so.1 -> librocprofiler-sdk-tool.so.1.3.1
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofv3-list-avail.so -> librocprofv3-list-avail.so.1
+lrwxrwxrwx root/root ./lib/rocprofiler-sdk/librocprofv3-list-avail.so.1 -> librocprofv3-list-avail.so.1.3.1
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libcommon.so -> libcommon.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libcommon.so.13.0 -> libcommon.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdynDwarf.so -> libdynDwarf.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdynDwarf.so.13.0 -> libdynDwarf.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdynElf.so -> libdynElf.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdynElf.so.13.0 -> libdynElf.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdyninstAPI.so -> libdyninstAPI.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdyninstAPI.so.13.0 -> libdyninstAPI.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libdyninstAPI_RT.so -> ../librocprof-sys-rt.so.1.7.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libgotcha.so -> libgotcha.so.2
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libgotcha.so.2 -> libgotcha.so.2.4.2
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libinstructionAPI.so -> libinstructionAPI.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libinstructionAPI.so.13.0 -> libinstructionAPI.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libparseAPI.so -> libparseAPI.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libparseAPI.so.13.0 -> libparseAPI.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpatchAPI.so -> libpatchAPI.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpatchAPI.so.13.0 -> libpatchAPI.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpcontrol.so -> libpcontrol.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpcontrol.so.13.0 -> libpcontrol.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpfm.so -> libpfm.so.4.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libpfm.so.4 -> libpfm.so.4.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libstackwalk.so -> libstackwalk.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libstackwalk.so.13.0 -> libstackwalk.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libsymtabAPI.so -> libsymtabAPI.so.13.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libsymtabAPI.so.13.0 -> libsymtabAPI.so.13.0.0
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbb.so -> libtbb.so.12
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbb.so.12 -> libtbb.so.12.17
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbbmalloc.so -> libtbbmalloc.so.2
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbbmalloc.so.2 -> libtbbmalloc.so.2.17
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbbmalloc_proxy.so -> libtbbmalloc_proxy.so.2
+lrwxrwxrwx root/root ./lib/rocprofiler-systems/libtbbmalloc_proxy.so.2 -> libtbbmalloc_proxy.so.2.17
+lrwxrwxrwx root/root ./share/hipblaslt/tensilelite/rocisa/libstinkytofu.so.0 -> libstinkytofu.so.0.1.0
+lrwxrwxrwx root/root ./share/rdc/rdctst_tests/libgtest.so -> libgtest.so.1.14.0
+lrwxrwxrwx root/root ./share/rdc/rdctst_tests/libgtest_main.so -> libgtest_main.so.1.14.0

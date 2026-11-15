@@ -1,0 +1,11 @@
+prefix=/home/runner/_work/TheRock/TheRock/output/build/third-party/fftw3/build_fftw3/stage
+exec_prefix=/home/runner/_work/TheRock/TheRock/output/build/third-party/fftw3/build_fftw3/stage
+libdir=/home/runner/_work/TheRock/TheRock/output/build/third-party/fftw3/build_fftw3/stage/lib
+includedir=/home/runner/_work/TheRock/TheRock/output/build/third-party/fftw3/build_fftw3/stage/include
+
+Name: FFTW
+Description: fast Fourier transform library
+Version: 3.3.9
+Libs: -L${libdir} -lfftw3 
+Libs.private: -lm
+Cflags: -I${includedir}

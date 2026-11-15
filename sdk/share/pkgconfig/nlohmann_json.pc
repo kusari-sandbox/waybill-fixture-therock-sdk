@@ -1,0 +1,7 @@
+prefix=/home/runner/_work/TheRock/TheRock/output/build/third-party/nlohmann-json/stage
+includedir=${prefix}/include
+
+Name: nlohmann_json
+Description: JSON for Modern C++
+Version: 3.12.0
+Cflags: -I${includedir}

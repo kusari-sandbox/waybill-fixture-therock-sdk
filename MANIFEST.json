@@ -1,0 +1,13 @@
+{
+  "capture_run_id": "43731970271",
+  "extracted": {
+    "cmake-version": 84,
+    "pkg-config": 254
+  },
+  "library_files_listed": 1263,
+  "members_in_tarball": 43900,
+  "s3_version_id": "nC_zQeaccuo2uqpYvvLJV2rismYLhW5t",
+  "sha256": "efeb6b07211030d0dea0f89e15017fe269f80c8811e22b61799bfb32b0c8bc5a",
+  "size_bytes": 3317540625,
+  "source": "https://rocm.nightlies.amd.com/tarball/therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz"
+}
