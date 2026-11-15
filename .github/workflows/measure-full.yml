@@ -162,6 +162,47 @@ jobs:
               for line in open(f"out/{a}-run0.log"):
                   if "hash cache:" in line:
                       print(f"- {a} hash cache: `{line.strip()[-60:]}`")
+          # Spec 1533 (#1564): the test scope. Bytes are of the distinct files
+          # each scoped component records, read from the extracted tree.
+          sdk = os.environ["WORK"] + "/sdk"
+          prop = lambda c, n: next((p["value"] for p in c.get("properties", []) if p["name"] == n), None)
+          def paths(c):
+              out = set()
+              for o in c.get("evidence", {}).get("occurrences", []) or []:
+                  out.add(o.get("location", ""))
+              fp = prop(c, "waybill:file-paths")
+              if fp:
+                  out.update(json.loads(fp))
+              rel = set()
+              for x in out:
+                  x = x[len(sdk) + 1:] if x.startswith(sdk + "/") else x.lstrip("/")
+                  if x:
+                      rel.add(x)
+              return rel
+          size = lambda r: os.path.getsize(os.path.join(sdk, r)) if os.path.isfile(os.path.join(sdk, r)) else 0
+          for a in ["base", "branch"]:
+              d = json.load(open(f"out/{a}.cdx.json"))
+              c226 = [p["value"] for p in d.get("metadata", {}).get("properties", []) if p["name"] == "waybill:test-scope-coverage"]
+              print(f"\n### Test scope, {a}\n\n- C226: `{c226[0] if c226 else 'absent'}`")
+              by_rule, seen = {}, set()
+              suspicious_pkg, scoped_so = [], []
+              for c in comps(d):
+                  if c.get("scope") != "excluded" or prop(c, "waybill:lifecycle-scope") != "test":
+                      continue
+                  rule = prop(c, "waybill:lifecycle-scope-derivation") or "(none)"
+                  files = {r for r in paths(c) if r not in seen}
+                  seen |= files
+                  n, b = by_rule.get(rule, (0, 0))
+                  by_rule[rule] = (n + 1, b + sum(size(r) for r in files))
+                  mech = prop(c, "waybill:source-mechanism")
+                  if mech in ("pkg-config", "cmake-package-version") and not any(c["name"].lower().endswith(s) for s in ("-tests", "_tests", "-test", "_test")):
+                      suspicious_pkg.append(c["name"])
+                  if ".so" in c["name"] or c["name"].endswith(".a"):
+                      scoped_so.append(next(iter(sorted(paths(c))), c["name"]))
+              for rule, (n, b) in sorted(by_rule.items()):
+                  print(f"- `{rule}`: {n} components, {b / 1e9:.3f} GB of distinct files")
+              print(f"- SC-003: installed-library components scoped that are not named as test packages: {len(suspicious_pkg)} {suspicious_pkg[:10]}")
+              print(f"- SC-003: scoped libraries (`.so`/`.a`): {len(scoped_so)}; first: {sorted(scoped_so)[:15]}")
           PY
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
