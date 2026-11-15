@@ -1,0 +1,20 @@
+#----------------------------------------------------------------
+# Generated CMake target import file for configuration "Release".
+#----------------------------------------------------------------
+
+# Commands may need to know the format version.
+set(CMAKE_IMPORT_FILE_VERSION 1)
+
+# Import target "hsa-runtime64::hsa-runtime64" for configuration "Release"
+set_property(TARGET hsa-runtime64::hsa-runtime64 APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(hsa-runtime64::hsa-runtime64 PROPERTIES
+  IMPORTED_LINK_DEPENDENT_LIBRARIES_RELEASE "rocprofiler-register::rocprofiler-register"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libhsa-runtime64.so.1.21.0"
+  IMPORTED_SONAME_RELEASE "libhsa-runtime64.so.1"
+  )
+
+list(APPEND _cmake_import_check_targets hsa-runtime64::hsa-runtime64 )
+list(APPEND _cmake_import_check_files_for_hsa-runtime64::hsa-runtime64 "${_IMPORT_PREFIX}/lib/libhsa-runtime64.so.1.21.0" )
+
+# Commands beyond this point should not need to know the version.
+set(CMAKE_IMPORT_FILE_VERSION)
