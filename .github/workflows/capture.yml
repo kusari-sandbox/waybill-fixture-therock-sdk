@@ -62,7 +62,7 @@ jobs:
             '*.pc' '*ConfigVersion.cmake' '*-config-version.cmake' \
             './share/therock/*.json' './share/doc/NOTICES.txt' './.info/version' \
             '*Targets.cmake' '*Targets-*.cmake' '*Exports.cmake' '*Exports-*.cmake' \
-            '*-targets.cmake' '*-targets-*.cmake' '*-exports.cmake' '*-exports-*.cmake'
+            '*-targets.cmake' '*-targets-*.cmake'
           # Library files: name, type, size and link target only; no content.
           grep -E '(\.so(\.[0-9]+)*|\.a|\.dylib)( -> .*)?$' "$RUNNER_TEMP/listing.txt" \
             | awk '{ $3=""; $4=""; $5=""; print }' | sed 's/  */ /g' | LC_ALL=C sort > listing/library-files.txt
