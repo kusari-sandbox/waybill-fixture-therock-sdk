@@ -1,0 +1,171 @@
+name: measure-full
+
+# Scans the full TheRock install tree (not the metadata-only fixture), so
+# that file attribution and scan time can be measured. Downloads the same
+# pinned tarball as `capture`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref under test"
+        type: string
+        default: 1532-cmake-exported-targets
+      base_ref:
+        description: "waybill ref to compare against"
+        type: string
+        default: main
+      tarball:
+        type: string
+        default: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+      version_id:
+        type: string
+        default: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+      expected_size:
+        type: string
+        default: "3317540625"
+
+permissions:
+  contents: read
+
+jobs:
+  measure-full:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Validate inputs
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          [[ "$TARBALL" =~ ^therock-dist-linux-[A-Za-z0-9._-]+\.tar\.gz$ ]] || { echo "bad tarball name"; exit 1; }
+          [[ "$VERSION_ID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad version id"; exit 1; }
+          [[ "$EXPECTED_SIZE" =~ ^[0-9]+$ ]] || { echo "bad size"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.base_ref }}
+          path: base
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: branch
+
+      - name: Build both
+        run: |
+          set -euo pipefail
+          for side in base branch; do
+            (cd "$side" && cargo build --release -p waybill)
+            echo "$side $(git -C "$side" rev-parse HEAD)"
+          done
+
+      - name: Choose a work directory
+        run: |
+          set -euo pipefail
+          df -h / /mnt || true
+          avail_mnt=$(df --output=avail -B1G /mnt 2>/dev/null | tail -n 1 | tr -d ' ' || echo 0)
+          avail_root=$(df --output=avail -B1G / | tail -n 1 | tr -d ' ')
+          echo "free GB: /mnt=$avail_mnt /=$avail_root"
+          if [ "${avail_mnt:-0}" -ge 25 ]; then
+            sudo mkdir -p /mnt/work && sudo chown "$(id -u):$(id -g)" /mnt/work
+            echo "WORK=/mnt/work" >> "$GITHUB_ENV"; echo "EXTRACT=full" >> "$GITHUB_ENV"
+          elif [ "$avail_root" -ge 25 ]; then
+            echo "WORK=$RUNNER_TEMP/work" >> "$GITHUB_ENV"; echo "EXTRACT=full" >> "$GITHUB_ENV"
+          else
+            echo "WORK=$RUNNER_TEMP/work" >> "$GITHUB_ENV"; echo "EXTRACT=lib-bin-libexec" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download and extract
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORK/sdk"
+          url="https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$WORK/sdk.tar.gz" "$url"
+          size=$(stat -c %s "$WORK/sdk.tar.gz")
+          [ "$size" = "$EXPECTED_SIZE" ] || { echo "size $size != expected $EXPECTED_SIZE"; exit 1; }
+          sha256sum "$WORK/sdk.tar.gz"
+          if [ "$EXTRACT" = full ]; then
+            tar -xzf "$WORK/sdk.tar.gz" -C "$WORK/sdk"
+          else
+            tar -xzf "$WORK/sdk.tar.gz" -C "$WORK/sdk" ./lib ./bin ./libexec
+          fi
+          rm -f "$WORK/sdk.tar.gz"
+          echo "extract=$EXTRACT"; du -sh "$WORK/sdk"; df -h "$WORK"
+
+      - name: Scan, interleaved
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 -I -B - <<'PY'
+          import os, subprocess, time, statistics, json
+          work = os.environ["WORK"]
+          def run(side, tag):
+              env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home-{side}")
+              t = time.time()
+              subprocess.run([f"{side}/target/release/waybill", "--offline", "sbom", "scan", "--path", f"{work}/sdk",
+                              "--no-deep-hash", "--format", "cyclonedx-json",
+                              "--output", f"cyclonedx-json=out/{side}.cdx.json"],
+                             env=env, check=True, stdout=subprocess.DEVNULL,
+                             stderr=open(f"out/{side}-{tag}.log", "w"))
+              return time.time() - t
+          arms = ["base", "branch"]
+          warm = {a: run(a, "warmup") for a in arms}
+          res = {a: [] for a in arms}
+          for r in range(3):
+              for a in (arms if r % 2 == 0 else arms[::-1]):
+                  res[a].append(run(a, f"run{r}"))
+          json.dump({"warmup": warm, "runs": res}, open("out/timing.json", "w"), indent=2)
+          PY
+
+      - name: Report
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+          BASE_REF: ${{ inputs.base_ref }}
+        run: |
+          set -euo pipefail
+          python3 -I -B - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, os, statistics, subprocess
+          t = json.load(open("out/timing.json"))
+          med = {a: statistics.median(v) for a, v in t["runs"].items()}
+          print(f"## {os.environ['WAYBILL_REF']} vs {os.environ['BASE_REF']} (extract={os.environ['EXTRACT']})\n")
+          for a in ["base", "branch"]:
+              rev = subprocess.run(["git", "-C", a, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+              v = t["runs"][a]
+              print(f"- **{a}** `{rev}`: runs {[round(x, 1) for x in v]} s, median {med[a]:.1f} s, warm-up {t['warmup'][a]:.1f} s")
+          print(f"\n**Ratio (branch / base, median):** {med['branch'] / med['base']:.3f}\n")
+          def comps(d):
+              out, st = [], list(d.get("components", []))
+              while st:
+                  c = st.pop(); out.append(c); st.extend(c.get("components", []))
+              return out
+          for a in ["base", "branch"]:
+              d = json.load(open(f"out/{a}.cdx.json"))
+              cov = [p["value"] for p in d.get("metadata", {}).get("properties", []) if p["name"] == "waybill:installed-library-coverage"]
+              libs = [c for c in comps(d) if any(p["name"] == "waybill:source-mechanism" and p["value"] in ("pkg-config", "cmake-package-version") for p in c.get("properties", []))]
+              files = 0
+              for c in libs:
+                  sf = next((p["value"] for p in c.get("properties", []) if p["name"] == "waybill:source-files"), "[]")
+                  files += sum(1 for f in json.loads(sf) if not (f.endswith(".pc") or f.endswith(".cmake")))
+              print(f"- **{a}**: {len(comps(d))} components, {len(libs)} installed-library components, {files} non-metadata files in their evidence")
+              print(f"  - C225: `{cov[0] if cov else 'absent'}`")
+          for a in ["base", "branch"]:
+              for line in open(f"out/{a}-run0.log"):
+                  if "hash cache:" in line:
+                      print(f"- {a} hash cache: `{line.strip()[-60:]}`")
+          PY
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: measure-full
+          path: out/
