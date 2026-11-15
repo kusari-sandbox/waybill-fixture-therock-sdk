@@ -1,0 +1,87 @@
+{
+  "the_rock_commit": "4230b2b515f3cd055f19e41da06cdf0b3b24b2de",
+  "github_job": "portable_linux_packages",
+  "github_run_id": "27392289755",
+  "rocm_package_version": "7.14.0a20260612",
+  "rocm_version": "7.14.0",
+  "submodules": [
+    {
+      "submodule_name": "half",
+      "submodule_path": "base/half",
+      "submodule_url": "https://github.com/ROCm/half.git",
+      "pin_sha": "207ee58595a64b5c4a70df221f1e6e704b807811",
+      "patches": []
+    },
+    {
+      "submodule_name": "rocm-cmake",
+      "submodule_path": "base/rocm-cmake",
+      "submodule_url": "https://github.com/ROCm/rocm-cmake.git",
+      "pin_sha": "10155d7272ea1bf79f6b5a9dbc339657af1aa372",
+      "patches": []
+    },
+    {
+      "submodule_name": "llvm-project",
+      "submodule_path": "compiler/amd-llvm",
+      "submodule_url": "https://github.com/ROCm/llvm-project.git",
+      "pin_sha": "52226beb248fcdd136d084307a12207d2fc00220",
+      "patches": [
+        "patches/amd-mainline/llvm-project/0002-hipcc-fix-default-include-path-on-Windows-and-adapt-.patch",
+        "patches/amd-mainline/llvm-project/0006-Rework-constructHipPath-so-HIP_PATH-env-var-is-lower.patch"
+      ]
+    },
+    {
+      "submodule_name": "HIPIFY",
+      "submodule_path": "compiler/hipify",
+      "submodule_url": "https://github.com/ROCm/HIPIFY.git",
+      "pin_sha": "6acec7751d2b2bfe162dba9efdcf7c16efb27bd8",
+      "patches": []
+    },
+    {
+      "submodule_name": "spirv-llvm-translator",
+      "submodule_path": "compiler/spirv-llvm-translator",
+      "submodule_url": "https://github.com/ROCm/SPIRV-LLVM-Translator.git",
+      "pin_sha": "fb08e83ae872775acfeaee53fda3ccf99a04ba53",
+      "patches": []
+    },
+    {
+      "submodule_name": "rocgdb",
+      "submodule_path": "debug-tools/rocgdb/source",
+      "submodule_url": "https://github.com/ROCm/rocgdb.git",
+      "pin_sha": "e9a74a0a3bf7367f46ca632b0b314570088bc494",
+      "patches": []
+    },
+    {
+      "submodule_name": "libhipcxx",
+      "submodule_path": "math-libs/libhipcxx",
+      "submodule_url": "https://github.com/ROCm/libhipcxx.git",
+      "pin_sha": "fa4ccc6beb77bfaa59a6fbeeebc94a4f18678945",
+      "patches": []
+    },
+    {
+      "submodule_name": "rocm-libraries",
+      "submodule_path": "rocm-libraries",
+      "submodule_url": "https://github.com/ROCm/rocm-libraries",
+      "pin_sha": "9811f2ea52356e8b66fd5694a9d2ded76d0d0349",
+      "patches": []
+    },
+    {
+      "submodule_name": "rocm-systems",
+      "submodule_path": "rocm-systems",
+      "submodule_url": "https://github.com/ROCm/rocm-systems.git",
+      "pin_sha": "1b2a555677ae5ed2e859d22db97b12ff69b343bd",
+      "patches": []
+    },
+    {
+      "submodule_name": "amd-mesa",
+      "submodule_path": "third-party/sysdeps/linux/amd-mesa/mesa-fork",
+      "submodule_url": "https://github.com/ROCm/mesa-fork.git",
+      "pin_sha": "b941dd736ffc1ea4768954ab79886445dcef5473",
+      "patches": []
+    }
+  ],
+  "flags": {
+    "KPACK_SPLIT_ARTIFACTS": false,
+    "STAMP_LIBRARY_GIT_VERSIONS": true,
+    "INCLUDE_HRX": false
+  }
+}
