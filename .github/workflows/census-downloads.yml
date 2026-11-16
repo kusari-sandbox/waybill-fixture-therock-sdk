@@ -6,7 +6,12 @@ name: census-downloads
 # the captured therock_manifest.json.
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref to scan the rocSPARSE/hipSPARSE roots with (empty: census only)"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -45,6 +50,44 @@ jobs:
           set -euo pipefail
           mkdir -p out
           python3 -I -B fixture/census/downloads.py src out/downloads.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: inputs.waybill_ref != ''
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+      - name: Scan rocSPARSE and hipSPARSE roots (waybill spec 1535 SC-001)
+        if: inputs.waybill_ref != ''
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)"
+          for p in rocsparse hipsparse; do
+            HOME="$RUNNER_TEMP/home-$p" waybill/target/release/waybill --offline sbom scan \
+              --path "src/rocm-libraries/projects/$p" --no-deep-hash \
+              --format cyclonedx-json,spdx-3-json \
+              --output "cyclonedx-json=out/$p.cdx.json" --output "spdx-3-json=out/$p.spdx3.json"
+          done
+          python3 -I -B - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json, os
+          stems = sorted({os.path.splitext(l.split(" ", 2)[2].split(" -> ")[0])[0].rsplit("/", 1)[1]
+                          for l in open("fixture/listing/all-files.txt")
+                          if l.startswith("- ") and "/clients/matrices/" in l})
+          print(f"## SC-001\n\ninstalled matrix stems: {len(stems)}\n")
+          for p in ["rocsparse", "hipsparse"]:
+              d = json.load(open(f"out/{p}.cdx.json"))
+              meta = {x["name"]: x["value"] for x in d["metadata"].get("properties", [])}
+              ds = [c for c in d.get("components", []) if c.get("type") == "data"]
+              names = sorted(c["name"] for c in ds)
+              print(f"### {p}\n\n- C229: `{meta.get('waybill:declared-downloads', 'absent')}`")
+              print(f"- data components: {len(ds)}; all with checksum: {all('checksum=' in c['purl'] for c in ds)}")
+              print(f"- matching installed stems: {len(set(names) & set(stems))}; not installed: {sorted(set(names) - set(stems))}")
+              for c in ds[:3]:
+                  print(f"  - `{c['purl']}`")
+              g = json.load(open(f"out/{p}.spdx3.json"))["@graph"]
+              print(f"- SPDX 3 dataset_DatasetPackage elements: {sum(1 for e in g if e.get('type') == 'dataset_DatasetPackage')}\n")
+          PY
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
