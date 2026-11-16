@@ -7,8 +7,9 @@ name: measure-wheels
 #
 # - NumPy, auditwheel manylinux (numpy.libs/) and delocate macOS (numpy/.dylibs/),
 #   pinned by SHA-256 from PyPI's JSON API (2026-11-16).
-# - rocm-sdk-libraries from the ROCm stable wheel index. The first run resolves
-#   the newest; pass `rocm_version` and `rocm_sha256` to pin later runs.
+# - rocm-sdk-libraries 10.1.0 from the ROCm stable wheel index, which publishes
+#   no hashes; the first run records the SHA-256, and later runs pass it as
+#   `rocm_sha256`.
 
 on:
   workflow_dispatch:
@@ -22,9 +23,9 @@ on:
         type: string
         default: ""
       rocm_version:
-        description: "rocm-sdk-libraries version (empty: newest on the stable index)"
+        description: "rocm-sdk-libraries version on the stable index (its wheels are tagged linux_x86_64)"
         type: string
-        default: ""
+        default: "10.1.0"
       rocm_sha256:
         description: "expected SHA-256 of the rocm-sdk-libraries wheel (empty: record only)"
         type: string
@@ -66,7 +67,7 @@ jobs:
           [[ -z "$ROCM_VERSION" || "$ROCM_VERSION" =~ ^[A-Za-z0-9.+-]+$ ]] || { echo "bad rocm_version"; exit 1; }
           spec="rocm-sdk-libraries${ROCM_VERSION:+==$ROCM_VERSION}"
           python3 -m pip download --no-deps --only-binary :all: --dest wheels/rocm \
-            --index-url "$ROCM_INDEX" --platform manylinux_2_28_x86_64 --python-version 3.12 "$spec"
+            --index-url "$ROCM_INDEX" --platform linux_x86_64 --python-version 3.12 "$spec"
           w=$(ls wheels/rocm/*.whl)
           mv "$w" wheels/
           sum=$(sha256sum "wheels/$(basename "$w")" | cut -d' ' -f1)
