@@ -55,9 +55,12 @@ def region(f, secs, names, cap=None):
     return bytes(buf)
 
 
+EXAMPLES = collections.defaultdict(list)
+
+
 def analyse(blob):
-    """(attributing names, header-only names, bundled names, toolchain-only?) for one region."""
-    names, header_names, bundled = set(), set(), set()
+    """(attributing names, header-only names, bundled names, toolchain-only?, outermost-only names) for one region."""
+    names, header_names, bundled, outer = set(), set(), set(), set()
     any_src = False
     for s in blob.split(b"\0"):
         for m in PATH.finditer(s):
@@ -72,7 +75,7 @@ def analyse(blob):
                 continue
             parts = p.strip("/").split("/")[:-1]
             vendored = False
-            hits = set()
+            hits = []
             for i, seg in enumerate(parts):
                 low = seg.lower()
                 if low in VENDOR and i + 1 < len(parts):
@@ -87,11 +90,16 @@ def analyse(blob):
                     vendored = True
                     break
                 if low in NAMES:
-                    hits.add(low)
+                    hits.append(low)
             if vendored:
                 continue
             (names if comp else header_names).update(hits)
-    return names, header_names - names, bundled, any_src
+            if comp and hits:
+                outer.add(hits[0])
+                for h in hits:
+                    if len(EXAMPLES[h]) < 4 and p not in EXAMPLES[h]:
+                        EXAMPLES[h].append(p)
+    return names, header_names - names, bundled, any_src, outer
 
 
 files = [l.strip() for l in open(listfile) if l.strip()]
@@ -109,12 +117,12 @@ for i, rel in enumerate(files):
             "debug": region(f, secs, [".debug_str", ".debug_line_str"]),
         }
     for k, blob in regions.items():
-        n, h, b, src = analyse(blob)
-        rec[k] = {"names": sorted(n), "header_only": sorted(h), "bundled": sorted(b), "any_source_path": src, "bytes": len(blob)}
+        n, h, b, src, o = analyse(blob)
+        rec[k] = {"names": sorted(n), "header_only": sorted(h), "bundled": sorted(b), "any_source_path": src, "bytes": len(blob), "outermost": sorted(o)}
     recs.append(rec)
     if i % 50 == 0:
         print(f"{i}/{len(files)}", flush=True)
-json.dump(recs, open(out_path, "w"), indent=1, sort_keys=True)
+json.dump({"records": recs, "examples": EXAMPLES}, open(out_path, "w"), indent=1, sort_keys=True)
 
 gb = lambda n: f"{n / 1e9:.3f} GB"
 print(f"\n## Attribution census, {len(recs)} binaries ({gb(sum(r['size'] for r in recs))})\n")
