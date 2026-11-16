@@ -47,6 +47,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          path: fixture-checkout
+      - name: Census input for the report
+        run: mkdir -p fixture-census && cp fixture-checkout/census/attribution-v3.json fixture-census/
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
           repository: kusari-oss/waybill
           ref: ${{ inputs.base_ref }}
           path: base
@@ -203,6 +209,36 @@ jobs:
                   print(f"- `{rule}`: {n} components, {b / 1e9:.3f} GB of distinct files")
               print(f"- SC-003: installed-library components scoped that are not named as test packages: {len(suspicious_pkg)} {suspicious_pkg[:10]}")
               print(f"- SC-003: scoped libraries (`.so`/`.a`): {len(scoped_so)}; first: {sorted(scoped_so)[:15]}")
+          # Spec 1534 (#1532): embedded-path attribution and bundled trees.
+          census = {r["path"]: r for r in json.load(open("fixture-census/attribution-v3.json"))["records"]}
+          for a in ["base", "branch"]:
+              d = json.load(open(f"out/{a}.cdx.json"))
+              meta = {p["name"]: p["value"] for p in d.get("metadata", {}).get("properties", [])}
+              c225 = json.loads(meta.get("waybill:installed-library-coverage", "{}"))
+              print(f"\n### Embedded paths, {a}\n\n- C225 embedded-paths: `{json.dumps(c225.get('embedded-paths'))}`")
+              print(f"- C228: `{meta.get('waybill:bundled-source-trees', 'absent')}`")
+              per_pkg, files, disagree = {}, {}, []
+              for c in comps(d):
+                  v = prop(c, "waybill:embedded-path-binaries")
+                  if not v:
+                      continue
+                  for e in json.loads(v):
+                      rel = e["path"]
+                      files[rel] = size(rel)
+                      n, b = per_pkg.get(c["name"], (0, 0))
+                      per_pkg[c["name"]] = (n + 1, b + size(rel))
+                      expect = set(census.get(rel, {}).get("ro_full", {}).get("outermost", [])) - {"amd"}
+                      if c["name"].lower() not in expect:
+                          disagree.append((rel, c["name"], sorted(expect)))
+              print(f"- attributed binaries: {len(files)}, {sum(files.values()) / 1e9:.3f} GB distinct")
+              for k, (n, b) in sorted(per_pkg.items(), key=lambda x: -x[1][1])[:25]:
+                  print(f"  - `{k}`: {n} binaries, {b / 1e9:.3f} GB")
+              print(f"- SC-002 disagreements with the census: {len(disagree)} {disagree[:10]}")
+              bundled = {}
+              for c in comps(d):
+                  if prop(c, "waybill:evidence-kind") == "embedded-source-path":
+                      bundled[c["name"]] = bundled.get(c["name"], 0) + 1
+              print(f"- bundled components by name: {sorted(bundled.items(), key=lambda x: -x[1])}")
           PY
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
