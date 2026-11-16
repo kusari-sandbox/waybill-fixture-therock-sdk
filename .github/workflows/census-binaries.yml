@@ -1,0 +1,76 @@
+name: census-binaries
+
+# What the installed binaries that no package claims carry that could name
+# their source: build-id, .comment, DWARF compile units and embedded absolute
+# source paths (waybill spec 1534, #1532). Extracts only the listed files
+# from the same pinned tarball as `capture`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tarball:
+        type: string
+        default: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+      version_id:
+        type: string
+        default: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+      expected_size:
+        type: string
+        default: "3317540625"
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Validate inputs
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          [[ "$TARBALL" =~ ^therock-dist-linux-[A-Za-z0-9._-]+\.tar\.gz$ ]] || { echo "bad tarball name"; exit 1; }
+          [[ "$VERSION_ID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad version id"; exit 1; }
+          [[ "$EXPECTED_SIZE" =~ ^[0-9]+$ ]] || { echo "bad size"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - name: Download and extract the listed binaries
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          WORK="$RUNNER_TEMP/work"; echo "WORK=$WORK" >> "$GITHUB_ENV"
+          mkdir -p "$WORK/sdk"
+          url="https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$WORK/sdk.tar.gz" "$url"
+          size=$(stat -c %s "$WORK/sdk.tar.gz")
+          [ "$size" = "$EXPECTED_SIZE" ] || { echo "size $size != expected $EXPECTED_SIZE"; exit 1; }
+          sha256sum "$WORK/sdk.tar.gz"
+          sed 's#^#./#' fixture/census/unattributed-binaries.txt > "$WORK/members.txt"
+          tar -xzf "$WORK/sdk.tar.gz" -C "$WORK/sdk" -T "$WORK/members.txt"
+          rm -f "$WORK/sdk.tar.gz"
+          du -sh "$WORK/sdk"; readelf --version | head -n 1
+
+      - name: Census
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 -I -B fixture/census/embedded-paths.py "$WORK/sdk" fixture/census/unattributed-binaries.txt \
+            fixture/sdk/share/therock/therock_manifest.json out/census.json
+          python3 -I -B fixture/census/summarize.py out/census.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-binaries
+          path: out/
