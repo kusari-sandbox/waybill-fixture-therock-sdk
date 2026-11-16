@@ -1,0 +1,123 @@
+name: measure-source
+
+# Scans TheRock's SOURCE tree (the super-project), with and without its git
+# submodules initialised, at two waybill refs. Measures waybill#1566 and
+# waybill#1538 (spec 1537, research R10): how many PyPI components declared
+# by the super-project's own requirements files are unreachable from the
+# root, and whether the three formats agree on the root's direct targets.
+# TheRock is cloned here, in CI only -- never locally.
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref under test"
+        type: string
+        default: main
+      base_ref:
+        description: "waybill ref to compare against"
+        type: string
+        default: main
+      therock_ref:
+        description: "TheRock commit (waybill#1538's pin)"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          df -h / | tee disk-before.txt
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h / | tee disk-after.txt
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.base_ref }}
+          path: base
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: branch
+
+      - name: Build both
+        run: |
+          set -euo pipefail
+          for side in base branch; do
+            (cd "$side" && cargo build --release -p waybill)
+            echo "$side $(git -C "$side" rev-parse HEAD)" | tee -a refs.txt
+          done
+
+      - name: Clone TheRock
+        env:
+          THEROCK_REF: ${{ inputs.therock_ref }}
+        run: |
+          set -euo pipefail
+          git init -q therock
+          git -C therock remote add origin https://github.com/ROCm/TheRock
+          git -C therock fetch -q --depth 1 origin "$THEROCK_REF"
+          git -C therock checkout -q FETCH_HEAD
+          echo "therock $(git -C therock rev-parse HEAD)" | tee -a refs.txt
+
+      - name: Scan without submodules
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for side in base branch; do
+            start=$(date +%s.%N)
+            HOME="$RUNNER_TEMP/home-$side" "$side/target/release/waybill" --offline sbom scan \
+              --path therock --root-name TheRock --root-version 10.3.0 \
+              --format cyclonedx-json --output "cyclonedx-json=out/$side.nosub.cdx.json" \
+              --format spdx-2.3-json --output "spdx-2.3-json=out/$side.nosub.spdx23.json" \
+              --format spdx-3-json --output "spdx-3-json=out/$side.nosub.spdx3.json" 2> "out/$side.nosub.log"
+            end=$(date +%s.%N)
+            echo "$side nosub $(echo "$end - $start" | bc)" >> out/times.txt
+          done
+
+      - name: Initialise submodules
+        run: |
+          set -euo pipefail
+          git -C therock submodule update --init --depth 1 --jobs 8
+          du -sh therock | tee -a out/times.txt
+          df -h / | tee -a disk-after.txt
+
+      - name: Scan with submodules
+        run: |
+          set -euo pipefail
+          for side in base branch; do
+            start=$(date +%s.%N)
+            HOME="$RUNNER_TEMP/home-$side" "$side/target/release/waybill" --offline sbom scan \
+              --path therock --root-name TheRock --root-version 10.3.0 \
+              --format cyclonedx-json --output "cyclonedx-json=out/$side.sub.cdx.json" \
+              --format spdx-2.3-json --output "spdx-2.3-json=out/$side.sub.spdx23.json" \
+              --format spdx-3-json --output "spdx-3-json=out/$side.sub.spdx3.json" 2> "out/$side.sub.log"
+            end=$(date +%s.%N)
+            echo "$side sub $(echo "$end - $start" | bc)" >> out/times.txt
+          done
+
+      - name: Report
+        run: |
+          set -euo pipefail
+          cp refs.txt disk-before.txt disk-after.txt out/
+          python3 -I -B fixture/census/source_report.py out | tee out/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: measure-source
+          path: out/
