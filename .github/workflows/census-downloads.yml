@@ -1,0 +1,52 @@
+name: census-downloads
+
+# Every CMake `file(DOWNLOAD ...)` in TheRock's pinned submodules, and which
+# resolve under waybill spec 1535's FR-001 (#1565). Sparse, blob-less
+# checkouts of `*.cmake` and `CMakeLists.txt` only, at the pins recorded in
+# the captured therock_manifest.json.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+      - name: Sparse checkouts at the pins
+        run: |
+          set -euo pipefail
+          mkdir -p src
+          python3 -I -B - <<'PY' > pins.tsv
+          import json
+          m = json.load(open("fixture/sdk/share/therock/therock_manifest.json"))
+          for s in m["submodules"]:
+              print(s["submodule_name"], s["submodule_url"], s["pin_sha"], sep="\t")
+          PY
+          while IFS=$'\t' read -r name url sha; do
+            [[ "$name" =~ ^[A-Za-z0-9._-]+$ && "$sha" =~ ^[0-9a-f]{40}$ && "$url" =~ ^https://github\.com/ ]] || { echo "bad pin $name"; exit 1; }
+            git init -q "src/$name"
+            git -C "src/$name" remote add origin "$url"
+            git -C "src/$name" config core.sparseCheckout true
+            git -C "src/$name" sparse-checkout set --no-cone '*.cmake' 'CMakeLists.txt'
+            git -C "src/$name" fetch -q --depth 1 --filter=blob:none origin "$sha"
+            git -C "src/$name" checkout -q FETCH_HEAD
+            echo "$name $(git -C "src/$name" rev-parse HEAD) $(find "src/$name" -name '*.cmake' -o -name CMakeLists.txt | wc -l) cmake files"
+          done < pins.tsv
+      - name: Census
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 -I -B fixture/census/downloads.py src out/downloads.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-downloads
+          path: out/
