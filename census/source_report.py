@@ -78,7 +78,12 @@ def cdx_facts(doc):
             1 for c in own if c["bom-ref"] not in seen and not prop(c, "waybill:orphan-reason")
         ),
     }
-    targets = {strip(purl_of.get(t, t)) for t in adj.get(root, [])}
+    # A target with no PURL (a file-tier entry) is counted, not compared:
+    # SPDX 2.3 names it by SPDXID and SPDX 3 by IRI, so it cannot match
+    # across formats by name. waybill's root_targets.py (spec 1537 I-1)
+    # compares those by content hash.
+    targets = {strip(purl_of[t]) for t in adj.get(root, []) if purl_of.get(t)}
+    stats["purlless_targets"] = sum(1 for t in adj.get(root, []) if not purl_of.get(t))
     verdict = prop(doc["metadata"], "waybill:graph-completeness")
     return stats, targets, verdict
 
@@ -92,13 +97,18 @@ def spdx23_targets(doc):
     purl_of = {}
     for p in doc.get("packages", []):
         refs = [e["referenceLocator"] for e in p.get("externalRefs", []) if e.get("referenceType") == "purl"]
-        purl_of[p["SPDXID"]] = refs[0] if refs else p["SPDXID"]
+        if refs:
+            purl_of[p["SPDXID"]] = refs[0]
     out = set()
     for r in doc["relationships"]:
         if r["spdxElementId"] == root and r["relationshipType"] == "DEPENDS_ON":
-            out.add(strip(purl_of.get(r["relatedSpdxElement"], r["relatedSpdxElement"])))
-        if r["relatedSpdxElement"] == root and r["relationshipType"].endswith("_DEPENDENCY_OF"):
-            out.add(strip(purl_of.get(r["spdxElementId"], r["spdxElementId"])))
+            t = r["relatedSpdxElement"]
+        elif r["relatedSpdxElement"] == root and r["relationshipType"].endswith("_DEPENDENCY_OF"):
+            t = r["spdxElementId"]
+        else:
+            continue
+        if t in purl_of:
+            out.add(strip(purl_of[t]))
     return out
 
 
@@ -115,8 +125,8 @@ def spdx3_targets(doc):
 
 print("## measure-source\n")
 print("```\n" + (OUT / "refs.txt").read_text() + "```\n")
-print("| side | mode | own-declared PyPI | with incoming edge | reachable from root | with orphan reason | unreachable, no reason | root targets cdx / spdx-2.3 / spdx-3 | formats agree | verdict |")
-print("|---|---|---|---|---|---|---|---|---|---|")
+print("| side | mode | own-declared PyPI | with incoming edge | reachable from root | with orphan reason | unreachable, no reason | root targets with a PURL, cdx / spdx-2.3 / spdx-3 | formats agree | cdx root targets without a PURL | verdict |")
+print("|---|---|---|---|---|---|---|---|---|---|---|")
 for side in ["base", "branch"]:
     for mode in ["nosub", "sub"]:
         stem = f"{side}.{mode}"
@@ -128,9 +138,16 @@ for side in ["base", "branch"]:
         agree = "yes" if t_cdx == t23 == t3 else "**no**"
         print(
             f"| {side} | {mode} | {stats['own']} | {stats['incoming']} | {stats['reachable']} | "
-            f"{stats['reason']} | {stats['unexplained']} | {len(t_cdx)} / {len(t23)} / {len(t3)} | {agree} | {verdict} |"
+            f"{stats['reason']} | {stats['unexplained']} | {len(t_cdx)} / {len(t23)} / {len(t3)} | {agree} | {stats['purlless_targets']} | {verdict} |"
         )
         (OUT / f"{side}.{mode}.root-targets.txt").write_text(
             "".join(f"{fmt}\t{t}\n" for fmt, ts in (("cdx", t_cdx), ("spdx23", t23), ("spdx3", t3)) for t in sorted(ts))
         )
+print(
+    "\n`formats agree` compares root targets by PURL. SPDX 3 gives a file-tier"
+    " package a PURL and CycloneDX does not, so a scan with file-tier root targets"
+    " can disagree here by naming alone. The cross-format check that counts is"
+    " waybill's `specs/1537-requirements-root-attach/measurements/root_targets.py`,"
+    " which keys file-tier entries by content hash."
+)
 print("\nTimes and disk:\n```\n" + (OUT / "times.txt").read_text() + "```")
