@@ -96,19 +96,43 @@ jobs:
           du -sh therock | tee -a out/times.txt
           df -h / | tee -a disk-after.txt
 
-      - name: Scan with submodules
+      # Timing is interleaved, as in measure-full. A fixed base-then-branch
+      # order scanned base on a cold page cache and branch on the cache base
+      # had just warmed, so branch always looked faster (waybill#1592: base
+      # 119/152/190 s against branch 102/125/120 s, a confound, not a result).
+      # The warm-up pass is untimed and writes the documents this run uploads;
+      # the timed rounds alternate the order and write CycloneDX to scratch.
+      - name: Scan with submodules, interleaved
         run: |
           set -euo pipefail
-          for side in base branch; do
-            start=$(date +%s.%N)
-            HOME="$RUNNER_TEMP/home-$side" "$side/target/release/waybill" --offline sbom scan \
-              --path therock --root-name TheRock --root-version 10.3.0 \
-              --format cyclonedx-json --output "cyclonedx-json=out/$side.sub.cdx.json" \
-              --format spdx-2.3-json --output "spdx-2.3-json=out/$side.sub.spdx23.json" \
-              --format spdx-3-json --output "spdx-3-json=out/$side.sub.spdx3.json" 2> "out/$side.sub.log"
-            end=$(date +%s.%N)
-            echo "$side sub $(echo "$end - $start" | bc)" >> out/times.txt
-          done
+          python3 -I -B - <<'PY'
+          import os, statistics, subprocess, time
+          def scan(side, outs, log):
+              env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home-{side}")
+              cmd = [f"{side}/target/release/waybill", "--offline", "sbom", "scan", "--path", "therock",
+                     "--root-name", "TheRock", "--root-version", "10.3.0"]
+              for fmt, path in outs:
+                  cmd += ["--format", fmt, "--output", f"{fmt}={path}"]
+              t = time.time()
+              subprocess.run(cmd, env=env, check=True, stdout=subprocess.DEVNULL, stderr=open(log, "w"))
+              return time.time() - t
+          arms = ["base", "branch"]
+          warm = {a: scan(a, [("cyclonedx-json", f"out/{a}.sub.cdx.json"),
+                              ("spdx-2.3-json", f"out/{a}.sub.spdx23.json"),
+                              ("spdx-3-json", f"out/{a}.sub.spdx3.json")], f"out/{a}.sub.log") for a in arms}
+          runs = {a: [] for a in arms}
+          os.makedirs("scratch", exist_ok=True)
+          for r in range(3):
+              for a in (arms if r % 2 == 0 else arms[::-1]):
+                  runs[a].append(scan(a, [("cyclonedx-json", f"scratch/{a}.cdx.json")], f"scratch/{a}-run{r}.log"))
+          with open("out/times.txt", "a") as f:
+              for a in arms:
+                  f.write(f"{a} sub warm-up {warm[a]:.3f}\n")
+                  for r, v in enumerate(runs[a]):
+                      f.write(f"{a} sub run{r} {v:.3f}\n")
+                  f.write(f"{a} sub median {statistics.median(runs[a]):.3f}\n")
+              f.write(f"ratio branch/base (median) {statistics.median(runs['branch']) / statistics.median(runs['base']):.3f}\n")
+          PY
 
       - name: Report
         run: |
