@@ -7,7 +7,8 @@ name: census-fetches
 # only: TheRock at the pin, then each top-level submodule at the commit TheRock
 # records for it (the same depth as measure-source's
 # `git submodule update --init`, without --recursive). Also the fetch-wrapper
-# census (waybill spec 1539, #1518): census/wrappers.py.
+# census (waybill spec 1539, #1518): census/wrappers.py. And the
+# download_project census (waybill spec 1540, #1594): census/download_project.py.
 
 on:
   workflow_dispatch:
@@ -78,6 +79,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 -I -B fixture/census/wrappers.py therock out/wrappers.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: download_project census
+        run: |
+          set -euo pipefail
+          python3 -I -B fixture/census/download_project.py therock out/download_project.json | tee -a "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: inputs.waybill_ref != ''
