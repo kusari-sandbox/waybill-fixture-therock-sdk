@@ -15,6 +15,10 @@ on:
         description: "waybill ref for repo report + scan of the same tree (empty: census only)"
         type: string
         default: main
+      base_ref:
+        description: "waybill ref to scan side by side with waybill_ref, 3 runs each (empty: none)"
+        type: string
+        default: ""
       therock_ref:
         description: "TheRock commit"
         type: string
@@ -76,6 +80,13 @@ jobs:
           repository: kusari-oss/waybill
           ref: ${{ inputs.waybill_ref }}
           path: waybill
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: inputs.waybill_ref != '' && inputs.base_ref != ''
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.base_ref }}
+          path: base
 
       - name: waybill repo report and scan of the same tree
         if: inputs.waybill_ref != ''
@@ -84,13 +95,25 @@ jobs:
           (cd waybill && cargo build --release -p waybill)
           echo "waybill $(git -C waybill rev-parse HEAD)" | tee -a out/refs.txt
           HOME="$RUNNER_TEMP/home" waybill/target/release/waybill repo report --offline --path therock --output out/repo-report.json
+          sides=(waybill)
+          if [ -d base ]; then
+            (cd base && cargo build --release -p waybill)
+            echo "base $(git -C base rev-parse HEAD)" | tee -a out/refs.txt
+            sides=(base waybill)
+          fi
+          # Interleaved, so drift on the runner falls on both sides alike.
           for i in 1 2 3; do
-            start=$(date +%s.%N)
-            HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan --path therock \
-              --root-name TheRock --root-version 10.3.0 --no-deep-hash \
-              --format cyclonedx-json --output "cyclonedx-json=out/scan.cdx.json" 2> out/scan.log
-            end=$(date +%s.%N)
-            echo "scan $i $(echo "$end - $start" | bc)" >> out/times.txt
+            for side in "${sides[@]}"; do
+              stem=scan; [ "$side" = base ] && stem=base-scan
+              start=$(date +%s.%N)
+              HOME="$RUNNER_TEMP/home-$side" "$side/target/release/waybill" --offline sbom scan --path therock \
+                --root-name TheRock --root-version 10.3.0 --no-deep-hash \
+                --format cyclonedx-json --format spdx-2.3-json --format spdx-3-json \
+                --output "cyclonedx-json=out/$stem.cdx.json" --output "spdx-2.3-json=out/$stem.spdx23.json" \
+                --output "spdx-3-json=out/$stem.spdx3.json" 2> "out/$stem.log"
+              end=$(date +%s.%N)
+              echo "$stem $i $(echo "$end - $start" | bc)" >> out/times.txt
+            done
           done
           python3 -I -B - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import json
