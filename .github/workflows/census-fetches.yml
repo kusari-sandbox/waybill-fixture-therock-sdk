@@ -1,0 +1,120 @@
+name: census-fetches
+
+# Every CMake FetchContent_Declare / ExternalProject_Add in TheRock's source at
+# a pinned commit, with its enclosing conditions, fallback shapes and literal
+# add_subdirectory()/include() reachability (waybill spec 1538, #1516/#1519).
+# Sparse, blob-less checkouts of `*.cmake`, `CMakeLists.txt` and `.gitmodules`
+# only: TheRock at the pin, then each top-level submodule at the commit TheRock
+# records for it (the same depth as measure-source's
+# `git submodule update --init`, without --recursive).
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref for repo report + scan of the same tree (empty: census only)"
+        type: string
+        default: main
+      therock_ref:
+        description: "TheRock commit"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - name: Sparse TheRock and submodules
+        env:
+          THEROCK_REF: ${{ inputs.therock_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$THEROCK_REF" =~ ^[0-9a-f]{40}$ ]] || { echo "therock_ref must be a full SHA"; exit 1; }
+          mkdir -p out
+          sparse() {  # <dir> <url> <sha>
+            git init -q "$1"
+            git -C "$1" remote add origin "$2"
+            git -C "$1" config core.sparseCheckout true
+            git -C "$1" sparse-checkout set --no-cone '*.cmake' 'CMakeLists.txt' '.gitmodules'
+            git -C "$1" fetch -q --depth 1 --filter=blob:none origin "$3"
+            git -C "$1" checkout -q FETCH_HEAD
+          }
+          sparse therock https://github.com/ROCm/TheRock "$THEROCK_REF"
+          echo "therock $(git -C therock rev-parse HEAD)" | tee out/refs.txt
+          git -C therock config -f .gitmodules --get-regexp '^submodule\..*\.path$' | while read -r key path; do
+            name=${key#submodule.}; name=${name%.path}
+            url=$(git -C therock config -f .gitmodules --get "submodule.$name.url")
+            case "$url" in ../*) url="https://github.com/ROCm/${url#../}";; esac
+            sha=$(git -C therock ls-tree HEAD -- "$path" | awk '$2=="commit"{print $3}')
+            if [[ ! "$path" =~ ^[A-Za-z0-9._/-]+$ || "$path" == *..* || ! "$url" =~ ^https://github\.com/[A-Za-z0-9._/-]+$ || ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "skip $name path=$path url=$url sha=$sha" | tee -a out/refs.txt
+              continue
+            fi
+            rm -rf "therock/$path"
+            sparse "therock/$path" "$url" "$sha"
+            echo "$path $sha $(find "therock/$path" \( -name '*.cmake' -o -name CMakeLists.txt \) -not -path '*/.git/*' | wc -l) cmake files" | tee -a out/refs.txt
+          done
+
+      - name: Census
+        run: |
+          set -euo pipefail
+          python3 -I -B fixture/census/fetches.py therock out/fetches.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: inputs.waybill_ref != ''
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: waybill repo report and scan of the same tree
+        if: inputs.waybill_ref != ''
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)" | tee -a out/refs.txt
+          HOME="$RUNNER_TEMP/home" waybill/target/release/waybill repo report --offline --path therock --output out/repo-report.json
+          for i in 1 2 3; do
+            start=$(date +%s.%N)
+            HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan --path therock \
+              --root-name TheRock --root-version 10.3.0 --no-deep-hash \
+              --format cyclonedx-json --output "cyclonedx-json=out/scan.cdx.json" 2> out/scan.log
+            end=$(date +%s.%N)
+            echo "scan $i $(echo "$end - $start" | bc)" >> out/times.txt
+          done
+          python3 -I -B - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json
+          rr = json.load(open("out/repo-report.json"))
+          cm = [r for r in rr["readers"] if r.get("reader_id") == "cmake"]
+          print("\n## waybill on the same tree\n")
+          print(f"- repo report cmake: `{json.dumps(cm)}`")
+          d = json.load(open("out/scan.cdx.json"))
+          comps, stack = [], list(d.get("components", []))
+          while stack:
+              c = stack.pop(); comps.append(c); stack.extend(c.get("components", []))
+          def prop(c, n):
+              return next((p["value"] for p in c.get("properties", []) if p["name"] == n), None)
+          mech = {}
+          for c in comps:
+              m = prop(c, "waybill:source-mechanism") or ""
+              if m.startswith("cmake"):
+                  mech[m] = mech.get(m, 0) + 1
+          print(f"- components by cmake source-mechanism: `{json.dumps(dict(sorted(mech.items())))}`")
+          print(f"- scan times: `{open('out/times.txt').read().split()}`")
+          PY
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-fetches
+          path: out/
