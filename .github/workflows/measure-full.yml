@@ -119,8 +119,10 @@ jobs:
               env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home-{side}")
               t = time.time()
               subprocess.run([f"{side}/target/release/waybill", "--offline", "sbom", "scan", "--path", f"{work}/sdk",
-                              "--no-deep-hash", "--format", "cyclonedx-json",
-                              "--output", f"cyclonedx-json=out/{side}.cdx.json"],
+                              "--no-deep-hash", "--format", "cyclonedx-json,spdx-2.3-json,spdx-3-json",
+                              "--output", f"cyclonedx-json=out/{side}.cdx.json",
+                              "--output", f"spdx-2.3-json=out/{side}.spdx23.json",
+                              "--output", f"spdx-3-json=out/{side}.spdx3.json"],
                              env=env, check=True, stdout=subprocess.DEVNULL,
                              stderr=open(f"out/{side}-{tag}.log", "w"))
               return time.time() - t
