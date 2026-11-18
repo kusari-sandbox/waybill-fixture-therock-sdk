@@ -1,0 +1,140 @@
+name: measure-flags
+
+# Times ONE waybill ref on TheRock's source tree (submodules initialised)
+# under several flag sets, to attribute scan time to a phase by switching
+# that phase off -- one variable per arm. Each arm's first document and log
+# are kept, so a faster arm can be checked for what it stopped emitting.
+# TheRock is cloned here, in CI only -- never locally.
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill ref (a branch, tag or full 40-character SHA)"
+        type: string
+        default: main
+      therock_ref:
+        description: "TheRock commit"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+      arms:
+        description: "label=extra args, separated by ';' (the first arm is the reference)"
+        type: string
+        default: "default=;go=--no-binary-scan go;symbols=--no-binary-scan symbols;all=--no-binary-scan all"
+      rounds:
+        description: "timed rounds per arm, after one untimed warm-up of the first arm"
+        type: string
+        default: "3"
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)" | tee -a out/refs.txt
+
+      - name: Clone TheRock with submodules
+        env:
+          THEROCK_REF: ${{ inputs.therock_ref }}
+        run: |
+          set -euo pipefail
+          git init -q therock
+          git -C therock remote add origin https://github.com/ROCm/TheRock
+          git -C therock fetch -q --depth 1 origin "$THEROCK_REF"
+          git -C therock checkout -q FETCH_HEAD
+          git -C therock submodule update --init --depth 1 --jobs 8
+          echo "therock $(git -C therock rev-parse HEAD)" | tee -a out/refs.txt
+          du -sh therock | tee -a out/refs.txt
+
+      # Rounds rotate the arm order (round r starts at arm r mod n), so no arm
+      # always runs first on a page cache another arm just warmed -- the
+      # confound waybill#1592 hit with a fixed order.
+      - name: Scan, rotated
+        env:
+          ARMS: ${{ inputs.arms }}
+          ROUNDS: ${{ inputs.rounds }}
+        run: |
+          set -euo pipefail
+          python3 -I -B - <<'PY'
+          import json, os, shlex, statistics, subprocess, time
+          arms = []
+          for part in os.environ["ARMS"].split(";"):
+              label, _, args = part.strip().partition("=")
+              if label:
+                  arms.append((label.strip(), shlex.split(args)))
+          rounds = int(os.environ["ROUNDS"])
+          def scan(label, args, keep):
+              env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home")
+              cdx = f"out/{label}.cdx.json" if keep else "out/scratch.cdx.json"
+              log = f"out/{label}.log" if keep else "out/scratch.log"
+              cmd = ["waybill/target/release/waybill", "--offline", "sbom", "scan", "--path", "therock",
+                     "--root-name", "TheRock", "--root-version", "10.3.0", *args,
+                     "--format", "cyclonedx-json", "--output", f"cyclonedx-json={cdx}"]
+              t = time.time()
+              subprocess.run(cmd, env=env, check=True, stdout=subprocess.DEVNULL, stderr=open(log, "w"))
+              return time.time() - t
+          warm = scan(arms[0][0] + "-warmup", arms[0][1], False)
+          runs = {label: [] for label, _ in arms}
+          for r in range(rounds):
+              order = arms[r % len(arms):] + arms[:r % len(arms)]
+              for label, args in order:
+                  runs[label].append(scan(label, args, r == 0))
+          json.dump({"warmup": warm, "arms": [[l, a] for l, a in arms], "runs": runs},
+                    open("out/timing.json", "w"), indent=2)
+          PY
+
+      - name: Report
+        run: |
+          set -euo pipefail
+          python3 -I -B - <<'PY' | tee out/report.md >> "$GITHUB_STEP_SUMMARY"
+          import json, statistics
+          t = json.load(open("out/timing.json"))
+          print("## measure-flags\n")
+          print("```"); print(open("out/refs.txt").read().strip()); print("```\n")
+          ref = statistics.median(t["runs"][t["arms"][0][0]])
+          print(f"Warm-up (untimed arm 1): {t['warmup']:.1f} s\n")
+          print("| arm | args | runs (s) | median (s) | vs first arm | components | binary-scan-suppressed |")
+          print("|---|---|---|---|---|---|---|")
+          def comps(d):
+              out, st = [], list(d.get("components", []))
+              while st:
+                  c = st.pop(); out.append(c); st.extend(c.get("components", []))
+              return out
+          for label, args in t["arms"]:
+              v = t["runs"][label]
+              m = statistics.median(v)
+              d = json.load(open(f"out/{label}.cdx.json"))
+              sup = next((p["value"] for p in d.get("metadata", {}).get("properties", [])
+                          if p["name"] == "waybill:binary-scan-suppressed"), "-")
+              print(f"| {label} | `{' '.join(args) or '(none)'}` | {', '.join(f'{x:.1f}' for x in v)} "
+                    f"| {m:.1f} | {m / ref:.3f} | {len(comps(d))} | {sup} |")
+          PY
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: measure-flags
+          path: |
+            out/
+            !out/scratch.*
