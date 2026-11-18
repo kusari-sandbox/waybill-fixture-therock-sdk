@@ -113,18 +113,23 @@ jobs:
           set -euo pipefail
           mkdir -p out
           python3 -I -B - <<'PY'
-          import os, subprocess, time, statistics, json
+          import os, subprocess, time, statistics, json, shutil
           work = os.environ["WORK"]
           def run(side, tag):
               env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home-{side}")
               t = time.time()
               subprocess.run([f"{side}/target/release/waybill", "--offline", "sbom", "scan", "--path", f"{work}/sdk",
                               "--no-deep-hash", "--format", "cyclonedx-json,spdx-2.3-json,spdx-3-json",
-                              "--output", f"cyclonedx-json=out/{side}.cdx.json",
-                              "--output", f"spdx-2.3-json=out/{side}.spdx23.json",
-                              "--output", f"spdx-3-json=out/{side}.spdx3.json"],
+                              "--output", f"cyclonedx-json=out/{side}-{tag}.cdx.json",
+                              "--output", f"spdx-2.3-json=out/{side}-{tag}.spdx23.json",
+                              "--output", f"spdx-3-json=out/{side}-{tag}.spdx3.json"],
                              env=env, check=True, stdout=subprocess.DEVNULL,
                              stderr=open(f"out/{side}-{tag}.log", "w"))
+              # Every scan's documents are kept (waybill spec 1542, #1600:
+              # comparing scans of one build). {side}.* is the last scan's,
+              # as before, for the report steps below.
+              for ext in ("cdx.json", "spdx23.json", "spdx3.json"):
+                  shutil.copyfile(f"out/{side}-{tag}.{ext}", f"out/{side}.{ext}")
               return time.time() - t
           arms = ["base", "branch"]
           warm = {a: run(a, "warmup") for a in arms}
