@@ -1,0 +1,55 @@
+name: census-dotdirs
+
+# Census of dependency manifests under dot-directories in TheRock's source
+# tree with submodules (waybill #1610). See census/dotdirs.py. TheRock is
+# cloned here, in CI only -- never locally.
+
+on:
+  workflow_dispatch:
+    inputs:
+      therock_ref:
+        description: "TheRock commit"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - name: Clone TheRock with submodules
+        env:
+          THEROCK_REF: ${{ inputs.therock_ref }}
+        run: |
+          set -euo pipefail
+          git init -q therock
+          git -C therock remote add origin https://github.com/ROCm/TheRock
+          git -C therock fetch -q --depth 1 origin "$THEROCK_REF"
+          git -C therock checkout -q FETCH_HEAD
+          git -C therock submodule update --init --depth 1 --jobs 8
+          echo "therock $(git -C therock rev-parse HEAD)"
+
+      - name: Census
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 -I -B fixture/census/dotdirs.py therock out/dotdirs.json | tee out/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-dotdirs
+          path: out/
