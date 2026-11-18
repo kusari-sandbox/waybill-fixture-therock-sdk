@@ -13,6 +13,11 @@ on:
         description: "waybill ref (a branch, tag or full 40-character SHA)"
         type: string
         default: main
+      target:
+        description: "source (TheRock with submodules) | sdk (the pinned installed tarball, --no-deep-hash)"
+        type: choice
+        options: [source, sdk]
+        default: source
       therock_ref:
         description: "TheRock commit"
         type: string
@@ -54,7 +59,36 @@ jobs:
           (cd waybill && cargo build --release -p waybill)
           echo "waybill $(git -C waybill rev-parse HEAD)" | tee -a out/refs.txt
 
+      - name: Choose a work directory
+        run: |
+          set -euo pipefail
+          avail_mnt=$(df --output=avail -B1G /mnt 2>/dev/null | tail -n 1 | tr -d ' ' || echo 0)
+          if [ "${avail_mnt:-0}" -ge 25 ]; then
+            sudo mkdir -p /mnt/work && sudo chown "$(id -u):$(id -g)" /mnt/work
+            echo "WORK=/mnt/work" >> "$GITHUB_ENV"
+          else
+            mkdir -p "$RUNNER_TEMP/work"; echo "WORK=$RUNNER_TEMP/work" >> "$GITHUB_ENV"
+          fi
+          echo "runner $(nproc) cores, $(free -g | awk '/^Mem:/{print $2}') GB RAM" | tee -a out/refs.txt
+
+      - name: Download the SDK
+        if: inputs.target == 'sdk'
+        env:
+          TARBALL: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+          VERSION_ID: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+          EXPECTED_SIZE: "3317540625"
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORK/sdk"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$WORK/sdk.tar.gz" "https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          [ "$(stat -c %s "$WORK/sdk.tar.gz")" = "$EXPECTED_SIZE" ] || { echo "size mismatch"; exit 1; }
+          sha256sum "$WORK/sdk.tar.gz" | tee -a out/refs.txt
+          tar -xzf "$WORK/sdk.tar.gz" -C "$WORK/sdk"
+          rm -f "$WORK/sdk.tar.gz"
+          du -sh "$WORK/sdk" | tee -a out/refs.txt
+
       - name: Clone TheRock with submodules
+        if: inputs.target == 'source'
         env:
           THEROCK_REF: ${{ inputs.therock_ref }}
         run: |
@@ -72,6 +106,7 @@ jobs:
       # confound waybill#1592 hit with a fixed order.
       - name: Scan, rotated
         env:
+          TARGET: ${{ inputs.target }}
           ARMS: ${{ inputs.arms }}
           ROUNDS: ${{ inputs.rounds }}
         run: |
@@ -88,8 +123,11 @@ jobs:
               env = dict(os.environ, HOME=f"{os.environ['RUNNER_TEMP']}/home")
               cdx = f"out/{label}.cdx.json" if keep else "out/scratch.cdx.json"
               log = f"out/{label}.log" if keep else "out/scratch.log"
-              cmd = ["waybill/target/release/waybill", "--offline", "sbom", "scan", "--path", "therock",
-                     "--root-name", "TheRock", "--root-version", "10.3.0", *args,
+              if os.environ["TARGET"] == "sdk":
+                  base = ["--path", f"{os.environ['WORK']}/sdk", "--no-deep-hash"]
+              else:
+                  base = ["--path", "therock", "--root-name", "TheRock", "--root-version", "10.3.0"]
+              cmd = ["waybill/target/release/waybill", "--offline", "sbom", "scan", *base, *args,
                      "--format", "cyclonedx-json", "--output", f"cyclonedx-json={cdx}"]
               t = time.time()
               subprocess.run(cmd, env=env, check=True, stdout=subprocess.DEVNULL, stderr=open(log, "w"))
