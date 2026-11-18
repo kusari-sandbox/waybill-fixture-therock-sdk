@@ -50,12 +50,19 @@ def kind(rel):
 
 
 files_under = collections.Counter()
+# Requirements-shaped names the pip selector skips: it reads only names that
+# start with "requirements" (waybill #1610 research). Whole tree, every depth.
+unselected = []
 manifests = collections.defaultdict(collections.Counter)
 samples = collections.defaultdict(list)
 for dirpath, dirnames, filenames in os.walk(root):
     dirnames[:] = sorted(d for d in dirnames if d != ".git")
     rel_dir = os.path.relpath(dirpath, root)
     parts = [] if rel_dir == "." else rel_dir.split(os.sep)
+    for fn in filenames:
+        low = fn.lower()
+        if fnmatch.fnmatch(low, "*requirements*.txt") and not low.startswith("requirements"):
+            unselected.append("/".join(parts + [fn]))
     dots = [p for p in parts if p.startswith(".")]
     if not dots:
         continue
@@ -73,6 +80,7 @@ result = {
     "files_under_dotdir": dict(files_under),
     "manifests": {d: dict(c) for d, c in manifests.items()},
     "samples": {f"{d} {k}": v for (d, k), v in samples.items()},
+    "requirements_names_not_selected": sorted(unselected),
 }
 json.dump(result, open(out_path, "w"), indent=1, sort_keys=True)
 
@@ -83,3 +91,6 @@ for d, n in files_under.most_common():
     m = manifests.get(d)
     if m or n >= 50:
         print(f"| `{d}` | {n} | {', '.join(f'{k} {v}' for k, v in sorted(m.items(), key=lambda kv: -kv[1])) if m else '-'} |")
+print(f"\n## Requirements-shaped names the pip selector skips: {len(unselected)}\n")
+for u in sorted(unselected):
+    print(f"- `{u}`")
