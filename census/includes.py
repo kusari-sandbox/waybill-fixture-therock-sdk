@@ -20,6 +20,15 @@ each with an empty condition stack. This census measures what that misses:
      under that directory that are unconditional in their own file
      (approximate: every CMake file in the subtree is counted).
 
+  E. Per package name: whether EVERY declaration of it is conditional once
+     the condition of the include() / add_subdirectory() chain that reaches
+     its file is counted ("effective"), and whether its own file's if()
+     blocks alone already make it so ("in-file"). A file is conditionally
+     reached when every include() or add_subdirectory() of it is inside an
+     if() block, or sits in a file that is itself conditionally reached.
+     Files nothing reaches (tree roots, or reached only through unresolved
+     paths) count as unconditional.
+
 Declarations: FetchContent_Declare, ExternalProject_Add, CPMAddPackage,
 find_package, pkg_check_modules, pkg_search_module, file(DOWNLOAD).
 
@@ -164,7 +173,10 @@ def parse(path):
             body -= 1
         k = kind(name, args)
         if k:
-            out["decls"].append({"kind": k, "line": line, "conditional": bool(conds), "in_body": body > 0})
+            nm = first_arg(args)
+            if name == "cpmaddpackage" and nm.upper() == "NAME":
+                nm = (args.split() + ["", ""])[1].strip('"')
+            out["decls"].append({"kind": k, "name": nm.lower(), "line": line, "conditional": bool(conds), "in_body": body > 0})
         elif name == "include":
             out["includes"].append({"arg": first_arg(args), "line": line, "conds": list(conds), "in_body": body > 0,
                                     "optional": "OPTIONAL" in args.split()})
@@ -274,6 +286,66 @@ def main():
                 d_counts.update(c)
                 d_rows.append({"from": rel(f), "line": sd["line"], "dir": rel(d), "conds": sd["conds"], "decls": dict(c)})
 
+    # E. effective conditionality per package name
+    reached_by = collections.defaultdict(list)  # file -> [(parent, conditional_site)]
+    for t, froms in included_from.items():
+        for f, conds, _ in froms:
+            reached_by[t].append((f, bool(conds)))
+    for f in cmake_files:
+        info = parse(f)
+        if not info:
+            continue
+        for sd in info["subdirs"]:
+            if VAR.search(sd["arg"]):
+                continue
+            d = pathlib.Path(os.path.normpath(f.parent / sd["arg"]))
+            target = d / "CMakeLists.txt"
+            if target.is_file():
+                reached_by[target].append((f, bool(sd["conds"])))
+    memo = {}
+
+    def cond_reached(f, stack=()):
+        if f in memo:
+            return memo[f]
+        if f in stack:
+            return False
+        edges = reached_by.get(f, [])
+        r = bool(edges) and all(c or cond_reached(p, stack + (f,)) for p, c in edges)
+        memo[f] = r
+        return r
+
+    per_name = collections.defaultdict(lambda: {"decls": 0, "in_file": 0, "effective": 0, "in_body": 0, "files": set()})
+    for f in cmake_files + never_read:
+        info = parse(f)
+        if not info:
+            continue
+        reached = cond_reached(f)
+        for d in info["decls"]:
+            if d["kind"] not in ("find", "fetch") or not d["name"] or "${" in d["name"]:
+                continue
+            e = per_name[(d["kind"], d["name"])]
+            e["decls"] += 1
+            e["files"].add(rel(f))
+            if d["in_body"]:
+                e["in_body"] += 1
+            if d["conditional"]:
+                e["in_file"] += 1
+            if d["conditional"] or reached:
+                e["effective"] += 1
+    e_rows = []
+    for (k, nm), e in sorted(per_name.items()):
+        e_rows.append({"kind": k, "name": nm, "decls": e["decls"], "in_file_conditional": e["in_file"],
+                       "effective_conditional": e["effective"], "in_body": e["in_body"],
+                       "only_conditional_in_file": e["in_file"] == e["decls"],
+                       "only_conditional_effective": e["effective"] == e["decls"], "files": sorted(e["files"])[:20]})
+    e_summary = collections.Counter()
+    for r in e_rows:
+        e_summary[(r["kind"], "names")] += 1
+        if r["only_conditional_in_file"]:
+            e_summary[(r["kind"], "only-conditional, in-file alone")] += 1
+        if r["only_conditional_effective"]:
+            e_summary[(r["kind"], "only-conditional, effective")] += 1
+
     result = {
         "root": str(ROOT),
         "cmake_files": len(cmake_files),
@@ -283,6 +355,7 @@ def main():
         "B_never_read": {"files": len(never_read), "decls": dict(b_counts), "rows": b_rows},
         "C_condition_lost": {"files": len(c_rows), "decls": dict(c_counts), "rows": c_rows},
         "D_conditional_subdirs": {"dirs": len(d_rows), "decls": dict(d_counts), "rows": d_rows},
+        "E_per_name": {"summary": {f"{k}: {v}": n for (k, v), n in sorted(e_summary.items())}, "rows": e_rows},
     }
     OUT.write_text(json.dumps(result, indent=1, sort_keys=True))
 
@@ -302,6 +375,10 @@ def main():
     p(f"Unconditional declarations in them: {dict(c_counts)}\n")
     for r in sorted(c_rows, key=lambda r: -sum(r["lost"].values()))[:40]:
         p(f"- `{r['file']}` {r['lost']} from " + "; ".join(f"`{x['file']}` if {x['conds']}" for x in r["included_from"][:3]))
+    p("\n### E. Package names declared only under conditions\n")
+    p("| kind | names | only conditional, in-file alone | only conditional, effective |\n|---|---|---|---|")
+    for k in ("find", "fetch"):
+        p(f"| {k} | {e_summary[(k, 'names')]} | {e_summary[(k, 'only-conditional, in-file alone')]} | {e_summary[(k, 'only-conditional, effective')]} |")
     p(f"\n### D. Context: {len(d_rows)} conditional add_subdirectory() with declarations beneath\n")
     p(f"Unconditional declarations beneath them (approximate): {dict(d_counts)}\n")
     for r in sorted(d_rows, key=lambda r: -sum(r["decls"].values()))[:25]:
