@@ -46,6 +46,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p out
+          export CMAKE_MODULES="$(cmake --system-information 2>/dev/null | sed -n 's/^CMAKE_ROOT "\(.*\)"$/\1/p')/Modules"
+          echo "cmake $(cmake --version | head -1); modules at $CMAKE_MODULES"
           python3 -I -B fixture/census/includes.py therock out/includes.json | tee out/summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -29,6 +29,16 @@ each with an empty condition stack. This census measures what that misses:
      Files nothing reaches (tree roots, or reached only through unresolved
      paths) count as unconditional.
 
+  F. Each find_package name, classified (first match wins):
+       first-party-project   a project(<name>) in the tree
+       first-party-config    a <name>Config.cmake[.in] / <name>-config.cmake[.in]
+                             in the tree (the tree installs it)
+       project-find-module   a Find<name>.cmake in the tree
+       cmake-find-module     a Find<name>.cmake in CMake's own Modules/
+                             (directory given by $CMAKE_MODULES)
+       other                 none of these: an external package found by
+                             config file on the system
+
 Declarations: FetchContent_Declare, ExternalProject_Add, CPMAddPackage,
 find_package, pkg_check_modules, pkg_search_module, file(DOWNLOAD).
 
@@ -286,6 +296,41 @@ def main():
                 d_counts.update(c)
                 d_rows.append({"from": rel(f), "line": sd["line"], "dir": rel(d), "conds": sd["conds"], "decls": dict(c)})
 
+    # F. classify find_package names
+    projects, configs, find_modules = set(), set(), set()
+    cfg_re = re.compile(r"^(.+?)(?:-config|Config)\.cmake(?:\.in)?$")
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [d for d in dirnames if d != ".git"]
+        for fn in filenames:
+            m = cfg_re.match(fn)
+            if m:
+                configs.add(m.group(1).lower())
+            if fn.startswith("Find") and fn.endswith(".cmake"):
+                find_modules.add(fn[4:-6].lower())
+    for f in cmake_files:
+        try:
+            text = f.read_text(errors="replace")
+        except OSError:
+            continue
+        for name, args, _ in commands(text):
+            if name == "project":
+                nm = first_arg(args)
+                if nm and "${" not in nm:
+                    projects.add(nm.lower())
+    cmake_mod_dir = pathlib.Path(os.environ.get("CMAKE_MODULES", "/nonexistent"))
+    cmake_find = {fn[4:-6].lower() for fn in os.listdir(cmake_mod_dir) if fn.startswith("Find") and fn.endswith(".cmake")} if cmake_mod_dir.is_dir() else set()
+
+    def find_class(nm):
+        if nm in projects:
+            return "first-party-project"
+        if nm in configs:
+            return "first-party-config"
+        if nm in find_modules:
+            return "project-find-module"
+        if nm in cmake_find:
+            return "cmake-find-module"
+        return "other"
+
     # E. effective conditionality per package name
     reached_by = collections.defaultdict(list)  # file -> [(parent, conditional_site)]
     for t, froms in included_from.items():
@@ -334,7 +379,7 @@ def main():
                 e["effective"] += 1
     e_rows = []
     for (k, nm), e in sorted(per_name.items()):
-        e_rows.append({"kind": k, "name": nm, "decls": e["decls"], "in_file_conditional": e["in_file"],
+        e_rows.append({"kind": k, "name": nm, "class": find_class(nm) if k == "find" else None, "decls": e["decls"], "in_file_conditional": e["in_file"],
                        "effective_conditional": e["effective"], "in_body": e["in_body"],
                        "only_conditional_in_file": e["in_file"] == e["decls"],
                        "only_conditional_effective": e["effective"] == e["decls"], "files": sorted(e["files"])[:20]})
@@ -379,6 +424,15 @@ def main():
     p("| kind | names | only conditional, in-file alone | only conditional, effective |\n|---|---|---|---|")
     for k in ("find", "fetch"):
         p(f"| {k} | {e_summary[(k, 'names')]} | {e_summary[(k, 'only-conditional, in-file alone')]} | {e_summary[(k, 'only-conditional, effective')]} |")
+    p(f"\n### F. find_package names by class (CMake modules: {len(cmake_find)} Find*.cmake in {cmake_mod_dir})\n")
+    p("| class | names | only conditional, effective | examples |\n|---|---|---|---|")
+    by_cls = collections.defaultdict(list)
+    for r in e_rows:
+        if r["kind"] == "find":
+            by_cls[r["class"]].append(r)
+    for c in ("first-party-project", "first-party-config", "project-find-module", "cmake-find-module", "other"):
+        rs = sorted(by_cls.get(c, []), key=lambda r: -r["decls"])
+        p(f"| {c} | {len(rs)} | {sum(r['only_conditional_effective'] for r in rs)} | {', '.join(r['name'] for r in rs[:14])} |")
     p(f"\n### D. Context: {len(d_rows)} conditional add_subdirectory() with declarations beneath\n")
     p(f"Unconditional declarations beneath them (approximate): {dict(d_counts)}\n")
     for r in sorted(d_rows, key=lambda r: -sum(r["decls"].values()))[:25]:
