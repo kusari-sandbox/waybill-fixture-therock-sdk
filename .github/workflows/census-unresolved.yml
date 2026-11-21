@@ -1,0 +1,114 @@
+name: census-unresolved
+
+# Census of CMake fetches whose URL, GIT_REPOSITORY or GIT_TAG stays unresolved
+# (waybill #1595, spec 1638 T001). See census/unresolved_fetches.py. TheRock is
+# cloned with its top-level submodules (measure-source's depth), in CI only --
+# never locally. The three waybill quality-corpus targets are cloned at their
+# pinned commits without submodules, as the quality corpus clones them. Each
+# tree is also scanned with waybill at `waybill_ref`, and every counted
+# declaration is reconciled against that scan.
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill commit (full SHA) to reconcile against"
+        type: string
+        required: true
+      therock_ref:
+        description: "TheRock commit"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: therock
+            url: https://github.com/ROCm/TheRock
+            submodules: "true"
+          - target: cmake-nlohmann-json
+            url: https://github.com/nlohmann/json
+            ref: 65ee68451d8eb2b5f3a30b410476ab83deb3289b
+            submodules: "false"
+          - target: python-pytorch
+            url: https://github.com/pytorch/pytorch
+            ref: 2b3ec34829036a65cd9d1398ea72a0167dc37470
+            submodules: "false"
+          - target: cpp-mongo
+            url: https://github.com/mongodb/mongo
+            ref: 41a5752480dd86b432e7d31e8150847002e16924
+            submodules: "false"
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - name: Check inputs
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$WAYBILL_REF" =~ ^[0-9a-f]{40}$ ]] || { echo "waybill_ref must be a full SHA"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: Clone target
+        env:
+          URL: ${{ matrix.url }}
+          REF: ${{ matrix.ref || inputs.therock_ref }}
+          SUBMODULES: ${{ matrix.submodules }}
+        run: |
+          set -euo pipefail
+          git init -q tree
+          git -C tree remote add origin "$URL"
+          git -C tree fetch -q --depth 1 origin "$REF"
+          git -C tree checkout -q FETCH_HEAD
+          if [ "$SUBMODULES" = "true" ]; then
+            git -C tree submodule update --init --depth 1 --jobs 8
+          fi
+          echo "tree $(git -C tree rev-parse HEAD)"
+
+      - name: Build waybill
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)"
+
+      - name: Scan and census
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          mv tree "$TARGET"
+          echo "tree $(git -C "$TARGET" rev-parse HEAD)" > out/refs.txt
+          echo "waybill $(git -C waybill rev-parse HEAD)" >> out/refs.txt
+          HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan --path "$TARGET" \
+            --no-deep-hash --format cyclonedx-json --output "out/scan-$TARGET.cdx.json" 2> "out/scan-$TARGET.log"
+          python3 -I -B fixture/census/unresolved_fetches.py "$TARGET" "out/unresolved-$TARGET.json" "out/scan-$TARGET.cdx.json" \
+            | tee "out/summary-$TARGET.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-unresolved-${{ matrix.target }}
+          path: out/
