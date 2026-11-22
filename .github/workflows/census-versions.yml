@@ -1,0 +1,237 @@
+name: census-versions
+
+# Census of waybill's curated embedded-version matches by the byte before
+# each literal (waybill #1568, #1641, spec 1643 T005). See census/versions.py.
+# waybill_ref must be a log-only build: it emits `waybill::version_census`
+# debug events and its output is unchanged. The SDK job scans the full pinned
+# tarball (the same one `measure-full` downloads); the corpus jobs scan the
+# 18 quality-corpus targets at their pins, as census-owners does.
+
+on:
+  workflow_dispatch:
+    inputs:
+      waybill_ref:
+        description: "waybill commit (full SHA), a log-only build"
+        type: string
+        required: true
+      tarball:
+        type: string
+        default: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+      version_id:
+        type: string
+        default: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+      expected_size:
+        type: string
+        default: "3317540625"
+
+permissions:
+  contents: read
+
+jobs:
+  sdk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Check inputs
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          [[ "$WAYBILL_REF" =~ ^[0-9a-f]{40}$ ]] || { echo "waybill_ref must be a full SHA"; exit 1; }
+          [[ "$TARBALL" =~ ^therock-dist-linux-[A-Za-z0-9._-]+\.tar\.gz$ ]] || { echo "bad tarball name"; exit 1; }
+          [[ "$VERSION_ID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad version id"; exit 1; }
+          [[ "$EXPECTED_SIZE" =~ ^[0-9]+$ ]] || { echo "bad size"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: Build waybill
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)"
+
+      - name: Choose a work directory
+        run: |
+          set -euo pipefail
+          avail_mnt=$(df --output=avail -B1G /mnt 2>/dev/null | tail -n 1 | tr -d ' ' || echo 0)
+          avail_root=$(df --output=avail -B1G / | tail -n 1 | tr -d ' ')
+          echo "free GB: /mnt=$avail_mnt /=$avail_root"
+          if [ "${avail_mnt:-0}" -ge 25 ]; then
+            sudo mkdir -p /mnt/work && sudo chown "$(id -u):$(id -g)" /mnt/work
+            echo "WORK=/mnt/work" >> "$GITHUB_ENV"
+          else
+            echo "WORK=$RUNNER_TEMP/work" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download and extract
+        env:
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORK/sdk"
+          url="https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$WORK/sdk.tar.gz" "$url"
+          size=$(stat -c %s "$WORK/sdk.tar.gz")
+          [ "$size" = "$EXPECTED_SIZE" ] || { echo "size $size != expected $EXPECTED_SIZE"; exit 1; }
+          sha256sum "$WORK/sdk.tar.gz" | tee sdk.sha256
+          tar -xzf "$WORK/sdk.tar.gz" -C "$WORK/sdk"
+          rm -f "$WORK/sdk.tar.gz"
+          du -sh "$WORK/sdk"
+
+      - name: Scan and census
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          echo "sdk $(cut -d' ' -f1 sdk.sha256)" > out/refs.txt
+          echo "waybill $(git -C waybill rev-parse HEAD)" >> out/refs.txt
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan \
+            --path "$WORK/sdk" --no-deep-hash --format cyclonedx-json,spdx-2.3-json,spdx-3-json \
+            --output "cyclonedx-json=out/scan-sdk.cdx.json" --output "spdx-2.3-json=out/scan-sdk.spdx23.json" \
+            --output "spdx-3-json=out/scan-sdk.spdx3.json" 2> out/scan-sdk.log
+          python3 -I -B fixture/census/versions.py therock-sdk out/scan-sdk.log out/versions-therock-sdk.json \
+            | tee out/summary-therock-sdk.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-versions-therock-sdk
+          path: out/
+
+  corpus:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: go-cobra
+            url: https://github.com/spf13/cobra
+            ref: a655097faf7d54f78933a815984b9919d51a05d2
+          - target: go-kubernetes
+            url: https://github.com/kubernetes/kubernetes
+            ref: 157e582fcc3ebba3c22b16721f49d6890f784c1f
+          - target: rust-ripgrep
+            url: https://github.com/BurntSushi/ripgrep
+            ref: 0e8390a66fbcf6eeac1aeb0541b367663a597c79
+          - target: rust-zizmor
+            url: https://github.com/zizmorcore/zizmor
+            ref: fb814d6687450fc8e0b0fba8d958b1ac40c0647f
+          - target: npm-express
+            url: https://github.com/expressjs/express
+            ref: e99649895f714c9dc9b3538e2cb0f58954f0ecfa
+          - target: pnpm-vue-core
+            url: https://github.com/vuejs/core
+            ref: d63616ca17de965ed32dcb449a4c5cd9982f15d2
+          - target: yarn-guac-visualizer
+            url: https://github.com/guacsec/guac-visualizer
+            ref: cd322cd47518f37ff6ec8a24377143eeb911e2e7
+          - target: python-flask
+            url: https://github.com/pallets/flask
+            ref: 80be49be88b534d2a72ef6bf5ea4aabf89f3305b
+          - target: python-ansible
+            url: https://github.com/ansible/ansible
+            ref: 6e7ec0333c89b258753534ec68caff167345079c
+          - target: python-pytorch
+            url: https://github.com/pytorch/pytorch
+            ref: 2b3ec34829036a65cd9d1398ea72a0167dc37470
+          - target: uv-meilisearch-python
+            url: https://github.com/meilisearch/meilisearch-python
+            ref: 8147a9dcff97da126663360588229079ab8400c8
+          - target: pants-backend-ai
+            url: https://github.com/lablup/backend.ai
+            ref: 809fcd394dd8e39456986dd742e7d51c6aedd647
+          - target: maven-guice
+            url: https://github.com/google/guice
+            ref: b0e1d0fab0167cd555ab8d262333c1a32db7d492
+          - target: gradle-apache-solr
+            url: https://github.com/apache/solr
+            ref: 28c1bc1f9394be8d6187a3550db964c49a9a8b0a
+          - target: gradle-bitwarden-android
+            url: https://github.com/bitwarden/android
+            ref: d817f6b4bf7c17172a74fabca1e09e738c7ec6c9
+          - target: ruby-rails
+            url: https://github.com/rails/rails
+            ref: 90588c21894456d979d7195502e6f5918f8d59ea
+          - target: cmake-nlohmann-json
+            url: https://github.com/nlohmann/json
+            ref: 65ee68451d8eb2b5f3a30b410476ab83deb3289b
+          - target: cpp-mongo
+            url: https://github.com/mongodb/mongo
+            ref: 41a5752480dd86b432e7d31e8150847002e16924
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+
+      - name: Check inputs
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$WAYBILL_REF" =~ ^[0-9a-f]{40}$ ]] || { echo "waybill_ref must be a full SHA"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: Clone target
+        env:
+          URL: ${{ matrix.url }}
+          REF: ${{ matrix.ref }}
+        run: |
+          set -euo pipefail
+          git init -q tree
+          git -C tree remote add origin "$URL"
+          git -C tree fetch -q --depth 1 origin "$REF"
+          git -C tree checkout -q FETCH_HEAD
+          echo "tree $(git -C tree rev-parse HEAD)"
+
+      - name: Build waybill
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+          echo "waybill $(git -C waybill rev-parse HEAD)"
+
+      - name: Scan and census
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          mv tree "$TARGET"
+          echo "tree $(git -C "$TARGET" rev-parse HEAD)" > out/refs.txt
+          echo "waybill $(git -C waybill rev-parse HEAD)" >> out/refs.txt
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan --path "$TARGET" \
+            --no-deep-hash --format cyclonedx-json --output "out/scan-$TARGET.cdx.json" 2> "out/scan-$TARGET.log"
+          python3 -I -B fixture/census/versions.py "$TARGET" "out/scan-$TARGET.log" "out/versions-$TARGET.json" \
+            | tee "out/summary-$TARGET.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-versions-${{ matrix.target }}
+          path: out/
