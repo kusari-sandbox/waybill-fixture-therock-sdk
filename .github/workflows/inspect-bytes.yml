@@ -1,0 +1,90 @@
+name: inspect-bytes
+
+# Where a literal sits in matching ELF files of the pinned SDK tarball: each
+# occurrence, its section and the bytes around it (census/inspect_bytes.py).
+# Read-only; the output is an artifact. Used for waybill spec 1644 (#1641):
+# GMP's `6.3.0` is present but no whole string, so waybill's census reports
+# no candidate.
+
+on:
+  workflow_dispatch:
+    inputs:
+      member_glob:
+        description: "tar --wildcards pattern(s), space-separated, for the members to extract"
+        type: string
+        required: true
+      needle:
+        description: "literal to locate"
+        type: string
+        required: true
+      tarball:
+        type: string
+        default: therock-dist-linux-gfx1150-7.14.0a20260612.tar.gz
+      version_id:
+        type: string
+        default: nC_zQeaccuo2uqpYvvLJV2rismYLhW5t
+      expected_size:
+        type: string
+        default: "3317540625"
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check inputs
+        env:
+          MEMBER_GLOB: ${{ inputs.member_glob }}
+          NEEDLE: ${{ inputs.needle }}
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          [[ "$MEMBER_GLOB" =~ ^[A-Za-z0-9._*/\ -]+$ ]] || { echo "bad member_glob"; exit 1; }
+          [[ "$NEEDLE" =~ ^[A-Za-z0-9._:/\ -]+$ ]] || { echo "bad needle"; exit 1; }
+          [[ "$TARBALL" =~ ^therock-dist-linux-[A-Za-z0-9._-]+\.tar\.gz$ ]] || { echo "bad tarball name"; exit 1; }
+          [[ "$VERSION_ID" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "bad version id"; exit 1; }
+          [[ "$EXPECTED_SIZE" =~ ^[0-9]+$ ]] || { echo "bad size"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - name: Download and extract the members
+        env:
+          MEMBER_GLOB: ${{ inputs.member_glob }}
+          TARBALL: ${{ inputs.tarball }}
+          VERSION_ID: ${{ inputs.version_id }}
+          EXPECTED_SIZE: ${{ inputs.expected_size }}
+        run: |
+          set -euo pipefail
+          url="https://rocm.nightlies.amd.com/tarball/${TARBALL}?versionId=${VERSION_ID}"
+          curl -fsSL --retry 3 --retry-delay 10 -o "$RUNNER_TEMP/sdk.tar.gz" "$url"
+          size=$(stat -c %s "$RUNNER_TEMP/sdk.tar.gz")
+          [ "$size" = "$EXPECTED_SIZE" ] || { echo "size $size != expected $EXPECTED_SIZE"; exit 1; }
+          mkdir -p out sdk
+          echo "sdk $(sha256sum "$RUNNER_TEMP/sdk.tar.gz" | cut -d' ' -f1)" > out/refs.txt
+          read -r -a globs <<< "$MEMBER_GLOB"
+          tar -xzf "$RUNNER_TEMP/sdk.tar.gz" -C sdk --wildcards "${globs[@]}"
+          find sdk -type f | LC_ALL=C sort > out/members.txt
+          find sdk -type l -printf '%p -> %l\n' | LC_ALL=C sort > out/links.txt
+          cat out/members.txt out/links.txt
+
+      - name: Inspect
+        env:
+          NEEDLE: ${{ inputs.needle }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < out/members.txt
+          python3 -I -B fixture/census/inspect_bytes.py "$NEEDLE" "${files[@]}" | tee out/inspect.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: inspect-bytes
+          path: out/
