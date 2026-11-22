@@ -6,6 +6,14 @@ name: census-versions
 # debug events and its output is unchanged. The SDK job scans the full pinned
 # tarball (the same one `measure-full` downloads); the corpus jobs scan the
 # 18 quality-corpus targets at their pins, as census-owners does.
+#
+# Spec 1644 (waybill #1641): the same events now include `anchored=` and
+# `unanchored=` lines for bzip2, GMP and liblzma. The `control` job scans a
+# synthetic tree (census/anchored_control.py) and fails unless it sees the
+# three expected `versioned` events and nothing else, so a zero in the other
+# jobs means absence, not a broken probe. The SDK job also saves the
+# strings of every liblzma-anchored binary, to look for a text anchor
+# (spec 1644 FR-003).
 
 on:
   workflow_dispatch:
@@ -28,6 +36,60 @@ permissions:
   contents: read
 
 jobs:
+  control:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check inputs
+        env:
+          WAYBILL_REF: ${{ inputs.waybill_ref }}
+        run: |
+          set -euo pipefail
+          [[ "$WAYBILL_REF" =~ ^[0-9a-f]{40}$ ]] || { echo "waybill_ref must be a full SHA"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: fixture
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: kusari-oss/waybill
+          ref: ${{ inputs.waybill_ref }}
+          path: waybill
+
+      - name: Build waybill
+        run: |
+          set -euo pipefail
+          (cd waybill && cargo build --release -p waybill)
+
+      - name: Scan the synthetic control tree
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          echo "waybill $(git -C waybill rev-parse HEAD)" > out/refs.txt
+          python3 -I -B fixture/census/anchored_control.py control-tree
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan \
+            --path control-tree --no-deep-hash --format cyclonedx-json --output out/scan-control.cdx.json 2> out/scan-control.log
+          python3 -I -B fixture/census/versions.py control out/scan-control.log out/versions-control.json out/scan-control.cdx.json \
+            | tee out/summary-control.md >> "$GITHUB_STEP_SUMMARY"
+          python3 -I -B - out/versions-control.json <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1]))
+          got = sorted((a["library"], a["verdict"], a.get("version")) for a in r["anchored"])
+          want = [("bzip2", "versioned", "1.0.8"), ("gmp", "versioned", "6.3.0"), ("liblzma", "versioned", "5.8.1")]
+          if got != want or r["unanchored"]:
+              sys.exit(f"control failed: {got} unanchored={r['unanchored']}")
+          print("control ok:", got)
+          PY
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: census-versions-control
+          path: out/
+
   sdk:
     runs-on: ubuntu-24.04
     timeout-minutes: 180
@@ -104,7 +166,21 @@ jobs:
             --output "cyclonedx-json=out/scan-sdk.cdx.json" --output "spdx-2.3-json=out/scan-sdk.spdx23.json" \
             --output "spdx-3-json=out/scan-sdk.spdx3.json" 2> out/scan-sdk.log
           python3 -I -B fixture/census/versions.py therock-sdk out/scan-sdk.log out/versions-therock-sdk.json \
-            | tee out/summary-therock-sdk.md >> "$GITHUB_STEP_SUMMARY"
+            out/scan-sdk.cdx.json | tee out/summary-therock-sdk.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Strings of liblzma-anchored binaries (spec 1644 FR-003)
+        run: |
+          set -euo pipefail
+          mkdir -p out/lzma-strings
+          python3 -I -B -c 'import json,sys; [print(a["path"]) for a in json.load(open(sys.argv[1]))["anchored"] if a["library"]=="liblzma"]' \
+            out/versions-therock-sdk.json | sort -u > out/lzma-paths.txt
+          wc -l < out/lzma-paths.txt
+          n=0
+          while IFS= read -r p; do
+            n=$((n+1))
+            strings -a -n 4 "$p" > "out/lzma-strings/$n.txt"
+            echo "$n $p" >> out/lzma-strings/index.txt
+          done < out/lzma-paths.txt
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
@@ -228,7 +304,7 @@ jobs:
           RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan --path "$TARGET" \
             --no-deep-hash --format cyclonedx-json --output "out/scan-$TARGET.cdx.json" 2> "out/scan-$TARGET.log"
           python3 -I -B fixture/census/versions.py "$TARGET" "out/scan-$TARGET.log" "out/versions-$TARGET.json" \
-            | tee "out/summary-$TARGET.md" >> "$GITHUB_STEP_SUMMARY"
+            "out/scan-$TARGET.cdx.json" | tee "out/summary-$TARGET.md" >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

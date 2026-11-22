@@ -6,11 +6,19 @@ writes, one per occurrence of a curated pattern found with no boundary test,
 and tallies them. It counts what the binary reports; it never re-scans bytes
 (that would be a second model of waybill's patterns).
 
-usage: versions.py TARGET SCAN_LOG OUT_JSON
+usage: versions.py TARGET SCAN_LOG OUT_JSON [SCAN_CDX]
 
 Event fields: path=<binary> hit=<json> with library, version, offset,
 preceding (start | nul | whitespace | other_non_identifier | identifier),
 accepted_main, accepted_new, context_before, context_after (hex).
+
+Spec 1644 (waybill #1641) adds two event kinds, both summarised here:
+  path=<binary> anchored=<json>    library, anchors, candidates, shared,
+                                   verdict, version (bzip2, gmp, liblzma)
+  path=<binary> unanchored=<json>  bzip2 date-form strings in a binary with
+                                   no bzip2 anchor (census only)
+With SCAN_CDX, the components the same scan already names bzip2, gmp,
+liblzma, xz or lzma are listed with their evidence (FR-001's third bullet).
 """
 
 import collections
@@ -19,11 +27,12 @@ import re
 import sys
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
-EVENT = re.compile(r"path=(.*?) hit=(\{.*\})\s*$")
+EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored)=(\{.*\})\s*$")
+NAMES = {"bzip2", "gmp", "liblzma", "xz", "lzma"}
 
 
 def events(log_path):
-    out = []
+    out = {"hit": [], "anchored": [], "unanchored": []}
     with open(log_path, encoding="utf-8", errors="replace") as f:
         for line in f:
             line = ANSI.sub("", line)
@@ -32,10 +41,30 @@ def events(log_path):
             m = EVENT.search(line)
             if not m:
                 raise SystemExit(f"unparsed census line: {line[:300]}")
-            hit = json.loads(m.group(2))
-            hit["path"] = m.group(1)
-            out.append(hit)
+            ev = json.loads(m.group(3))
+            ev["path"] = m.group(1)
+            out[m.group(2)].append(ev)
     return out
+
+
+def existing(cdx_path):
+    """Components the scan names bzip2/gmp/liblzma/xz/lzma, nested included."""
+    with open(cdx_path, encoding="utf-8") as f:
+        doc = json.load(f)
+    stack = list(doc.get("components", []))
+    found = []
+    while stack:
+        c = stack.pop()
+        stack.extend(c.get("components", []))
+        if c.get("name", "").lower() in NAMES:
+            props = {p.get("name"): p.get("value") for p in c.get("properties", [])}
+            found.append({
+                "name": c.get("name"),
+                "purl": c.get("purl"),
+                "evidence_kind": props.get("waybill:evidence-kind"),
+                "source_files": props.get("waybill:source-files"),
+            })
+    return sorted(found, key=lambda c: (c["name"], c["purl"] or ""))
 
 
 def printable(hexstr):
@@ -45,7 +74,9 @@ def printable(hexstr):
 
 def main():
     target, log_path, out_path = sys.argv[1:4]
-    hits = events(log_path)
+    cdx_path = sys.argv[4] if len(sys.argv) > 4 else None
+    evs = events(log_path)
+    hits = evs["hit"]
     by_lib = collections.defaultdict(collections.Counter)
     for h in hits:
         by_lib[h["library"]][h["preceding"]] += 1
@@ -79,6 +110,9 @@ def main():
         "binaries_gaining_or_changing": gained,
         "binaries_losing": lost,
         "newly_two_versions": two_versions,
+        "anchored": evs["anchored"],
+        "unanchored": evs["unanchored"],
+        "existing_components": existing(cdx_path) if cdx_path else None,
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
@@ -96,6 +130,32 @@ def main():
         print(f"- `{h['library']}@{h['version']}` [{h['preceding']}] new={h['accepted_new']} `{h['path']}`")
         print(f"  - before: `{printable(h['context_before'])}`")
         print(f"  - from: `{printable(h['context_after'])}`")
+
+    # Spec 1644: anchored whole-string libraries.
+    anch = evs["anchored"]
+    verdicts = collections.Counter((a["library"], a["verdict"]) for a in anch)
+    print(f"\n### Anchored libraries (spec 1644)\n\n{len(anch)} anchored events in "
+          f"{len({a['path'] for a in anch})} binaries.\n")
+    print("| library | versioned | ambiguous | ambiguous-shared | no-candidate |")
+    print("|---|---|---|---|---|")
+    for lib in sorted({a["library"] for a in anch}):
+        print(f"| {lib} | " + " | ".join(str(verdicts[(lib, v)]) for v in
+              ["versioned", "ambiguous", "ambiguous-shared", "no-candidate"]) + " |")
+    for a in sorted(anch, key=lambda a: (a["library"], a["path"])):
+        anchors = ", ".join(f"{x['kind']}:{x['value']}" for x in a["anchors"])
+        cands = ", ".join(c["value"] for c in a["candidates"]) or "-"
+        shared = ", ".join(f"{c['value']} (with {c['with']})" for c in a["shared"]) or "-"
+        print(f"- `{a['library']}` **{a['verdict']}** {a.get('version', '')} `{a['path']}`; "
+              f"anchors: {anchors}; candidates: {cands}; shared: {shared}")
+    un = evs["unanchored"]
+    print(f"\n**bzip2 date form without the anchor (FR-006):** {len(un)} binaries")
+    for u in sorted(un, key=lambda u: u["path"]):
+        print(f"- `{u['path']}`: " + ", ".join(c["value"] for c in u["candidates"]))
+    if cdx_path:
+        ex = report["existing_components"]
+        print(f"\n**Components this scan already names bzip2/gmp/liblzma/xz/lzma:** {len(ex)}")
+        for c in ex:
+            print(f"- `{c['purl']}` evidence={c['evidence_kind']} files={c['source_files']}")
 
 
 if __name__ == "__main__":
