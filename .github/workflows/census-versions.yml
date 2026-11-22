@@ -84,6 +84,33 @@ jobs:
           print("control ok:", got)
           PY
 
+      # Spec 1645 (waybill #1662): the identity control. At the log-only
+      # commit the census must report exactly these events, so a zero in the
+      # corpus jobs means absence, not a broken probe.
+      - name: Scan the spec 1645 identity control tree
+        run: |
+          set -euo pipefail
+          python3 -I -B fixture/census/anchored_control.py control-tree-unused identity-tree
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan \
+            --path identity-tree --no-deep-hash --format cyclonedx-json --output out/scan-identity.cdx.json 2> out/scan-identity.log
+          python3 -I -B fixture/census/versions.py identity out/scan-identity.log out/versions-identity.json out/scan-identity.cdx.json \
+            | tee out/summary-identity.md >> "$GITHUB_STEP_SUMMARY"
+          python3 -I -B - out/versions-identity.json <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1]))
+          shared = sorted((s["curated"]["library"], s["verdict"]) for s in r["shared_file"])
+          changes = sorted((c["library"], c["old"], c["new"]) for c in r["curated_version_change"])
+          cpes = sorted(c["purl"] for c in r["cpe_form_change"])
+          want = (
+              [("llvm", "version-disagrees"), ("ncurses", "merge")],
+              [("llvm", "23.0.0", "23.0.0git"), ("ncurses", "6.6", "6.6.20251230")],
+              ["pkg:generic/ncurses@6.4.20221231"],
+          )
+          if (shared, changes, cpes) != want:
+              sys.exit(f"identity control failed: {shared} {changes} {cpes}")
+          print("identity control ok:", shared, changes, cpes)
+          PY
+
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

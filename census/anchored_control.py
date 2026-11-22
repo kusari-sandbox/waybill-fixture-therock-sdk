@@ -12,7 +12,18 @@ A census run over it must report three `versioned` anchored events and
 nothing for the plain library. Otherwise a corpus target's zero means a
 broken probe, not an absence.
 
-usage: anchored_control.py OUT_DIR
+Spec 1645 (waybill #1662): with a second argument, also writes an
+installed-library tree there, the shape of waybill's
+`tests/library_identity.rs`:
+
+  lib/libncursesw.so.6 + lib/pkgconfig/ncursesw.pc      shared file, `merge`
+  lib/libLLVM.so + lib/cmake/llvm/LLVMConfigVersion.cmake
+                                     shared file, `version-disagrees` until
+                                     the LLVM suffix is kept (FR-002)
+  lib/libncurses.so.6 (no banner) + lib/pkgconfig/ncurses.pc 6.4.20221231
+                                     an ncurses CPE whose form changes
+
+usage: anchored_control.py OUT_DIR [IDENTITY_DIR]
 """
 
 import os
@@ -76,6 +87,24 @@ def main():
     }
     for n, b in files.items():
         with open(os.path.join(out, n), "wb") as fh:
+            fh.write(b)
+    if len(sys.argv) > 2:
+        identity(sys.argv[2], lead)
+
+
+def identity(out, lead):
+    files = {
+        "lib/libncursesw.so.6": elf(lead + b"ncurses 6.6.20251230\0"),
+        "lib/pkgconfig/ncursesw.pc": b"Version: 6.6.20251230\n",
+        "lib/libLLVM.so": elf(lead + b"LLVM version 23.0.0git\0"),
+        "lib/cmake/llvm/LLVMConfigVersion.cmake": b'set(PACKAGE_VERSION "23.0.0git")\n',
+        "lib/libncurses.so.6": elf(lead),
+        "lib/pkgconfig/ncurses.pc": b"Version: 6.4.20221231\n",
+    }
+    for n, b in files.items():
+        p = os.path.join(out, n)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "wb") as fh:
             fh.write(b)
 
 

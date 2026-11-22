@@ -19,6 +19,14 @@ Spec 1644 (waybill #1641) adds two event kinds, both summarised here:
                                    no bzip2 anchor (census only)
 With SCAN_CDX, the components the same scan already names bzip2, gmp,
 liblzma, xz or lzma are listed with their evidence (FR-001's third bullet).
+
+Spec 1645 (waybill #1662) adds three more, all summarised here:
+  path=<binary> curated_version_change=<json>  library, old, new (LLVM, ncurses)
+  shared_file=<json>      a file claimed by a curated match and an
+                          installed-library record: curated, file, records,
+                          verdict (merge | version-disagrees | name-unrelated |
+                          ambiguous)
+  cpe_form_change=<json>  purl, old, new (ncurses X.Y.YYYYMMDD)
 """
 
 import collections
@@ -27,12 +35,14 @@ import re
 import sys
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
-EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored)=(\{.*\})\s*$")
+EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored|curated_version_change)=(\{.*\})\s*$")
+PATHLESS = re.compile(r" (shared_file|cpe_form_change)=(\{.*\})\s*$")
 NAMES = {"bzip2", "gmp", "liblzma", "xz", "lzma"}
 
 
 def events(log_path):
-    out = {"hit": [], "anchored": [], "unanchored": []}
+    out = {"hit": [], "anchored": [], "unanchored": [], "curated_version_change": [],
+           "shared_file": [], "cpe_form_change": []}
     with open(log_path, encoding="utf-8", errors="replace") as f:
         for line in f:
             line = ANSI.sub("", line)
@@ -40,7 +50,11 @@ def events(log_path):
                 continue
             m = EVENT.search(line)
             if not m:
-                raise SystemExit(f"unparsed census line: {line[:300]}")
+                pm = PATHLESS.search(line)
+                if not pm:
+                    raise SystemExit(f"unparsed census line: {line[:300]}")
+                out[pm.group(1)].append(json.loads(pm.group(2)))
+                continue
             ev = json.loads(m.group(3))
             ev["path"] = m.group(1)
             out[m.group(2)].append(ev)
@@ -113,6 +127,9 @@ def main():
         "anchored": evs["anchored"],
         "unanchored": evs["unanchored"],
         "existing_components": existing(cdx_path) if cdx_path else None,
+        "curated_version_change": evs["curated_version_change"],
+        "shared_file": evs["shared_file"],
+        "cpe_form_change": evs["cpe_form_change"],
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
@@ -156,6 +173,22 @@ def main():
         print(f"\n**Components this scan already names bzip2/gmp/liblzma/xz/lzma:** {len(ex)}")
         for c in ex:
             print(f"- `{c['purl']}` evidence={c['evidence_kind']} files={c['source_files']}")
+
+    # Spec 1645: shared files, stated versions, ncurses CPE form.
+    sf = evs["shared_file"]
+    print(f"\n### Shared files (spec 1645)\n\n{len(sf)} files claimed by a curated match and a record.\n")
+    for s in sorted(sf, key=lambda s: (s["verdict"], s["file"])):
+        recs = "; ".join(f"{r['mechanism']} {r['name']}@{r['version']} name={r['name_qualifies']} "
+                         f"version={r['version_agrees']}" for r in s["records"])
+        print(f"- **{s['verdict']}** `{s['curated']['library']}@{s['curated']['version']}` `{s['file']}`: {recs}")
+    vc = evs["curated_version_change"]
+    print(f"\n**Curated version changes (FR-002, FR-013):** {len(vc)}")
+    for c in sorted(vc, key=lambda c: (c["library"], c["path"])):
+        print(f"- `{c['library']}` {c['old']} -> {c['new']} `{c['path']}`")
+    cf = evs["cpe_form_change"]
+    print(f"\n**ncurses CPE form changes (FR-008):** {len(cf)}")
+    for c in sorted(cf, key=lambda c: c["purl"]):
+        print(f"- `{c['purl']}`: `{c['old']}` -> `{c['new']}`")
 
 
 if __name__ == "__main__":
