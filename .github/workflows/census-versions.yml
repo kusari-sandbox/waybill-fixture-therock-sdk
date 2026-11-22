@@ -84,9 +84,9 @@ jobs:
           print("control ok:", got)
           PY
 
-      # Spec 1645 (waybill #1662): the identity control. At the log-only
-      # commit the census must report exactly these events, so a zero in the
-      # corpus jobs means absence, not a broken probe.
+      # Spec 1645 (waybill #1662): the identity control. The census must
+      # report exactly the log-only or the wired set of events, so a zero in
+      # the corpus jobs means absence, not a broken probe.
       - name: Scan the spec 1645 identity control tree
         run: |
           set -euo pipefail
@@ -101,12 +101,16 @@ jobs:
           shared = sorted((s["curated"]["library"], s["verdict"]) for s in r["shared_file"])
           changes = sorted((c["library"], c["old"], c["new"]) for c in r["curated_version_change"])
           cpes = sorted(c["purl"] for c in r["cpe_form_change"])
-          want = (
+          # The log-only commit (7db3e627) reports all three kinds. Once
+          # wired, LLVM's PURLs are equal (no shared file to decide) and the
+          # two census-only kinds are gone; ncurses is still `merge`.
+          log_only = (
               [("llvm", "version-disagrees"), ("ncurses", "merge")],
               [("llvm", "23.0.0", "23.0.0git"), ("ncurses", "6.6", "6.6.20251230")],
               ["pkg:generic/ncurses@6.4.20221231"],
           )
-          if (shared, changes, cpes) != want:
+          wired = ([("ncurses", "merge")], [], [])
+          if (shared, changes, cpes) not in (log_only, wired):
               sys.exit(f"identity control failed: {shared} {changes} {cpes}")
           print("identity control ok:", shared, changes, cpes)
           PY
