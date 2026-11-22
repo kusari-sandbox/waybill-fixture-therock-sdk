@@ -11,7 +11,8 @@ Events (each `event="<name>" payload=<json>`):
 - merge_source: a pip main module merged into an existing same-PURL entry
   (purl, tier, source_path, manifest_source_path, editable, agrees);
 - owner_candidates: a directory with more than one candidate at the best
-  rank (dir, candidates [{purl, rank, non_runtime, first_path}], step, owner);
+  rank (dir, candidates [{purl, rank, non_runtime, first_path}], owner; `step`
+  only at waybill 43042658, before spec 1642 dropped the runtime step);
 - dev_only_main_module: a main module with a non-runtime scope
   (purl, derivation, first_path, is_root, added_seed);
 - anchor_seed: a root anchor that may protect what it anchors (purl, kind);
@@ -75,7 +76,7 @@ def main():
         },
         "owner_candidates": {
             "directories": len(owners),
-            "by_step": dict(collections.Counter(o["step"] for o in owners)),
+            "by_step": dict(collections.Counter(o.get("step", "purl") for o in owners)),
             "lockfile_first_candidates": lockfile_first,
             "rows": owners,
         },
