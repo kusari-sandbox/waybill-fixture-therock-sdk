@@ -35,13 +35,13 @@ import re
 import sys
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
-EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored|curated_version_change)=(\{.*\})\s*$")
+EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored|curated_version_change|liblzma_static)=(\{.*\})\s*$")
 PATHLESS = re.compile(r" (shared_file|cpe_form_change|technique_change|binary_derived_kind|binary_merge)=(\{.*\})\s*$")
 NAMES = {"bzip2", "gmp", "liblzma", "xz", "lzma"}
 
 
 def events(log_path):
-    out = {"hit": [], "anchored": [], "unanchored": [], "curated_version_change": [],
+    out = {"hit": [], "anchored": [], "unanchored": [], "curated_version_change": [], "liblzma_static": [],
            "shared_file": [], "cpe_form_change": [], "technique_change": [],
            "binary_derived_kind": [], "binary_merge": []}
     with open(log_path, encoding="utf-8", errors="replace") as f:
@@ -80,6 +80,27 @@ def existing(cdx_path):
                 "source_files": props.get("waybill:source-files"),
             })
     return sorted(found, key=lambda c: (c["name"], c["purl"] or ""))
+
+
+def static_effects(evs):
+    """Spec 1647: per rule, the versions a rule would add and remove, from
+    each event's verdict lists (waybill's own `anchored_verdicts`, not a
+    model of it): a library `versioned` under the rule but not in `current`
+    is gained; one `versioned` in `current` and not under the rule is lost."""
+    out = {"rule_a": {"gained": [], "lost": []}, "rule_b": {"gained": [], "lost": []}}
+    for ev in evs:
+        cur = {v["library"]: v.get("version") for v in ev["current"] if v["verdict"] == "versioned"}
+        for rule in ("rule_a", "rule_b"):
+            if rule not in ev:
+                continue
+            new = {v["library"]: v.get("version") for v in ev[rule] if v["verdict"] == "versioned"}
+            for lib, ver in sorted(new.items()):
+                if cur.get(lib) != ver:
+                    out[rule]["gained"].append({"path": ev["path"], "library": lib, "version": ver})
+            for lib, ver in sorted(cur.items()):
+                if new.get(lib) != ver:
+                    out[rule]["lost"].append({"path": ev["path"], "library": lib, "version": ver})
+    return out
 
 
 def printable(hexstr):
@@ -134,6 +155,8 @@ def main():
         "technique_change": evs["technique_change"],
         "binary_derived_kind": evs["binary_derived_kind"],
         "binary_merge": evs["binary_merge"],
+        "liblzma_static": evs["liblzma_static"],
+        "liblzma_static_effects": static_effects(evs["liblzma_static"]),
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
@@ -211,6 +234,31 @@ def main():
         w, l = m["winner"], m["loser"]
         print(f"- `{m['purl']}` {m['site']}: winner {w['mechanism'] or w['evidence_kind']} / loser "
               f"{l['mechanism'] or l['evidence_kind']}; absorbed {m['absorbed']}")
+
+
+    # Spec 1647 (waybill #1664): a statically linked liblzma.
+    ls = evs["liblzma_static"]
+    ra = [e for e in ls if "rule_a" in e]
+    rb = [e for e in ls if "rule_b" in e]
+    print(f"\n### Static liblzma (spec 1647)\n\n{len(ls)} events: rule A (`.symtab` anchor) {len(ra)} files, "
+          f"rule B (xz header magic) {len(rb)} files")
+    for name, group in (("rule A", ra), ("rule B", rb)):
+        if not group:
+            continue
+        types = collections.Counter(e.get("elf_type", "non-elf") for e in group)
+        binds = collections.Counter(a["binding"] for e in group for a in e["anchors"] if a["table"] == "symtab")
+        verdicts = collections.Counter((v["library"], v["verdict"]) for e in group
+                                       for v in e["rule_a" if name == "rule A" else "rule_b"])
+        print(f"- {name}: ELF types {dict(sorted(types.items()))}; `.symtab` bindings {dict(sorted(binds.items()))}")
+        print(f"  verdicts {dict(sorted((f'{l} {v}', n) for (l, v), n in verdicts.items()))}")
+    eff = static_effects(ls)
+    for rule in ("rule_a", "rule_b"):
+        for kind in ("gained", "lost"):
+            for g in eff[rule][kind]:
+                print(f"- {rule} {kind}: `{g['library']}@{g['version']}` in `{g['path']}`")
+    if ls and cdx_path:
+        print(f"- existing liblzma/xz components in this document: "
+              f"{[c['purl'] for c in existing(cdx_path) if c['name'].lower() in ('liblzma', 'xz', 'lzma')]}")
 
 
 if __name__ == "__main__":

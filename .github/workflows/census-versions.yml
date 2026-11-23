@@ -140,6 +140,52 @@ jobs:
           print("spec 1646 control ok:", "log-only" if log_only else "wired", merged, changed)
           PY
 
+      # Spec 1647 (waybill #1664): a real static liblzma, built on the runner
+      # from census/static_lzma/a.c, unstripped and stripped. Log-only: the
+      # census shows rule A versioning the unstripped one and rule B the
+      # stripped one, and the document has no liblzma. Wired: the unstripped
+      # one is in the document, and the stripped one has no event (rule B
+      # removed) or still rule B (if it were adopted).
+      - name: Scan the spec 1647 static liblzma control
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends liblzma-dev
+          dpkg-query -W -f 'liblzma-dev ${Version}\n' liblzma-dev | tee -a out/refs.txt
+          mkdir -p static-tree
+          gcc -O2 -o static-tree/waybill-fixture-xzstatic fixture/census/static_lzma/a.c -static -llzma
+          cp static-tree/waybill-fixture-xzstatic static-tree/waybill-fixture-xzstripped
+          strip static-tree/waybill-fixture-xzstripped
+          gcc -O2 -o "$RUNNER_TEMP/lzma-version" fixture/census/static_lzma/b.c -llzma
+          ver=$("$RUNNER_TEMP/lzma-version" | awk '{print $3}')
+          echo "runner liblzma version: $ver"
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan \
+            --path static-tree --no-deep-hash --format cyclonedx-json --output out/scan-static.cdx.json 2> out/scan-static.log
+          python3 -I -B fixture/census/versions.py static out/scan-static.log out/versions-static.json out/scan-static.cdx.json \
+            | tee out/summary-static.md >> "$GITHUB_STEP_SUMMARY"
+          python3 -I -B - out/versions-static.json out/scan-static.cdx.json "$ver" <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1])); doc = json.load(open(sys.argv[2])); ver = sys.argv[3]
+          stack, purls = list(doc.get("components", [])), set()
+          while stack:
+              c = stack.pop(); stack.extend(c.get("components", []))
+              purls.add((c.get("purl") or "").split("?")[0])
+          lz = sorted(p for p in purls if p.startswith("pkg:generic/liblzma@"))
+          ev = {e["path"].rsplit("/", 1)[-1]: e for e in r["liblzma_static"]}
+          def verdict(e, rule):
+              v = [x for x in (e or {}).get(rule, []) if x["library"] == "liblzma"]
+              return (v[0]["verdict"], v[0].get("version")) if v else None
+          un, st = ev.get("waybill-fixture-xzstatic"), ev.get("waybill-fixture-xzstripped")
+          want = ("versioned", ver)
+          log_only = (verdict(un, "rule_a") == want and verdict(st, "rule_b") == want and lz == [])
+          wired = (verdict(un, "rule_a") == want and lz == [f"pkg:generic/liblzma@{ver}"]
+                   and (st is None or verdict(st, "rule_b") == want))
+          if not (log_only or wired):
+              sys.exit(f"spec 1647 control failed: ver={ver} unstripped={un} stripped={st} liblzma={lz}")
+          print("spec 1647 control ok:", "log-only" if log_only else "wired", ver, lz,
+                "stripped event" if st else "no stripped event")
+          PY
+
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
