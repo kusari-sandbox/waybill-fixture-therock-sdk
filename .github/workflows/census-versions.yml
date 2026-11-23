@@ -186,6 +186,43 @@ jobs:
                 "stripped event" if st else "no stripped event")
           PY
 
+      # Spec 1648 (waybill #1668): real builds on the runner. A dynamically
+      # linked C program gives dynamic-linkage components (glibc's versioned
+      # imports); a Go program gives BuildInfo components. Log-only: the
+      # C program's dynamic-linkage components have kind_technique_change and
+      # the Go binary's have go-buildinfo. Wired: dynamic-linkage reports
+      # binary-analysis in the document, and go-buildinfo is still counted.
+      - name: Scan the spec 1648 binary-kind control
+        run: |
+          set -euo pipefail
+          mkdir -p kind-tree "$RUNNER_TEMP/gosrc"
+          printf '#include <stdio.h>\nint main(void){puts("waybill-fixture");return 0;}\n' > "$RUNNER_TEMP/dyn.c"
+          gcc -O2 -o kind-tree/waybill-fixture-dyn "$RUNNER_TEMP/dyn.c"
+          printf 'package main\nimport "fmt"\nfunc main(){fmt.Println("waybill-fixture")}\n' > "$RUNNER_TEMP/gosrc/main.go"
+          (cd "$RUNNER_TEMP/gosrc" && go mod init example.com/waybill-fixture-go >/dev/null 2>&1 && go build -o "$GITHUB_WORKSPACE/kind-tree/waybill-fixture-gobin" .)
+          go version | tee -a out/refs.txt
+          RUST_LOG=waybill::version_census=debug HOME="$RUNNER_TEMP/home" waybill/target/release/waybill --offline sbom scan \
+            --path kind-tree --no-deep-hash --format cyclonedx-json --output out/scan-kind.cdx.json 2> out/scan-kind.log
+          python3 -I -B fixture/census/versions.py kind out/scan-kind.log out/versions-kind.json out/scan-kind.cdx.json \
+            | tee out/summary-kind.md >> "$GITHUB_STEP_SUMMARY"
+          python3 -I -B - out/versions-kind.json out/scan-kind.cdx.json <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1])); doc = json.load(open(sys.argv[2]))
+          stack, dl = list(doc.get("components", [])), {}
+          while stack:
+              c = stack.pop(); stack.extend(c.get("components", []))
+              props = {p.get("name"): p.get("value") for p in c.get("properties", [])}
+              if props.get("waybill:evidence-kind") == "dynamic-linkage":
+                  dl[c["purl"].split("?")[0]] = [m["technique"] for i in c.get("evidence", {}).get("identity", []) for m in i.get("methods", [])]
+          changed = sorted({c["purl"] for c in r["kind_technique_change"] if c["evidence_kind"] == "dynamic-linkage"})
+          gb = sorted({c["purl"] for c in r["binary_derived_kind"] if c["evidence_kind"] == "go-buildinfo"})
+          log_only = bool(dl) and changed == sorted(dl) and all(v == ["manifest-analysis"] for v in dl.values())
+          wired = bool(dl) and not r["kind_technique_change"] and all(v == ["binary-analysis"] for v in dl.values())
+          if not ((log_only or wired) and gb):
+              sys.exit(f"spec 1648 control failed: dynamic-linkage={dl} changed={changed} go-buildinfo={gb}")
+          print("spec 1648 control ok:", "log-only" if log_only else "wired", sorted(dl), len(gb), "go-buildinfo")
+          PY
+
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:

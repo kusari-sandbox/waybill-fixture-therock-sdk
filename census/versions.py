@@ -36,14 +36,14 @@ import sys
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored|curated_version_change|liblzma_static)=(\{.*\})\s*$")
-PATHLESS = re.compile(r" (shared_file|cpe_form_change|technique_change|binary_derived_kind|binary_merge)=(\{.*\})\s*$")
+PATHLESS = re.compile(r" (shared_file|cpe_form_change|technique_change|binary_derived_kind|binary_merge|kind_technique_change|kind_merge)=(\{.*\})\s*$")
 NAMES = {"bzip2", "gmp", "liblzma", "xz", "lzma"}
 
 
 def events(log_path):
     out = {"hit": [], "anchored": [], "unanchored": [], "curated_version_change": [], "liblzma_static": [],
            "shared_file": [], "cpe_form_change": [], "technique_change": [],
-           "binary_derived_kind": [], "binary_merge": []}
+           "binary_derived_kind": [], "binary_merge": [], "kind_technique_change": [], "kind_merge": []}
     with open(log_path, encoding="utf-8", errors="replace") as f:
         for line in f:
             line = ANSI.sub("", line)
@@ -156,6 +156,8 @@ def main():
         "binary_derived_kind": evs["binary_derived_kind"],
         "binary_merge": evs["binary_merge"],
         "liblzma_static": evs["liblzma_static"],
+        "kind_technique_change": evs["kind_technique_change"],
+        "kind_merge": evs["kind_merge"],
         "liblzma_static_effects": static_effects(evs["liblzma_static"]),
     }
     with open(out_path, "w", encoding="utf-8") as f:
@@ -259,6 +261,25 @@ def main():
     if ls and cdx_path:
         print(f"- existing liblzma/xz components in this document: "
               f"{[c['purl'] for c in existing(cdx_path) if c['name'].lower() in ('liblzma', 'xz', 'lzma')]}")
+
+
+    # Spec 1648 (waybill #1668): the technique of the other binary kinds.
+    kt = evs["kind_technique_change"]
+    print(f"\n### Binary kind technique (spec 1648)\n\n**Technique changes (FR-002):** {len(kt)} events, "
+          f"{len({c['purl'] for c in kt})} PURLs")
+    for k in sorted({c["evidence_kind"] for c in kt}):
+        sel = [c for c in kt if c["evidence_kind"] == k]
+        print(f"- {k}: {len(sel)} events, {len({c['purl'] for c in sel})} PURLs ({sel[0]['old']} -> {sel[0]['new']})")
+    km = evs["kind_merge"]
+    print(f"\n**Merges with a newly binary kind (FR-004):** {len(km)} events")
+    for m in sorted(km, key=lambda m: (m["purl"], m["site"])):
+        w, l = m["winner"], m["loser"]
+        print(f"- `{m['purl']}` {m['site']}: winner {w['mechanism'] or w['evidence_kind']} / loser {l['mechanism'] or l['evidence_kind']}")
+    go = [c for c in bd if c["evidence_kind"] in ("detected-go", "go-buildinfo")]
+    print(f"\n**Go (FR-005):** detected-go {sum(c['evidence_kind'] == 'detected-go' for c in go)} events / "
+          f"{len({c['purl'] for c in go if c['evidence_kind'] == 'detected-go'})} PURLs; go-buildinfo "
+          f"{sum(c['evidence_kind'] == 'go-buildinfo' for c in go)} events / "
+          f"{len({c['purl'] for c in go if c['evidence_kind'] == 'go-buildinfo'})} PURLs")
 
 
 if __name__ == "__main__":
