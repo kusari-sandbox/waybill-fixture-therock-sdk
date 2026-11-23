@@ -114,9 +114,9 @@ jobs:
               sys.exit(f"identity control failed: {shared} {changes} {cpes}")
           print("identity control ok:", shared, changes, cpes)
           PY
-          # Spec 1646 (waybill #1665): log-only, the census reports the two
-          # merges and three technique changes; wired, the events are gone
-          # and the document carries binary-analysis instead.
+          # Spec 1646 (waybill #1665): both states report the two merges with
+          # a record. Log-only also reports three technique changes; wired,
+          # that event is gone and the document carries binary-analysis.
           python3 -I -B - out/versions-identity.json out/scan-identity.cdx.json <<'PY'
           import json, sys
           r = json.load(open(sys.argv[1])); doc = json.load(open(sys.argv[2]))
@@ -130,7 +130,7 @@ jobs:
           zlib = [p for p in comps if p.startswith("pkg:generic/zlib")]
           log_only = (merged == ["pkg:generic/llvm@23.0.0git", "pkg:generic/ncurses@6.6.20251230"]
                       and changed == sorted(["pkg:generic/llvm@23.0.0git", "pkg:generic/ncurses@6.6.20251230"] + zlib))
-          wired = (not r["binary_merge"] and not r["technique_change"]
+          wired = (merged == ["pkg:generic/llvm@23.0.0git", "pkg:generic/ncurses@6.6.20251230"] and not r["technique_change"]
                    and comps.get("pkg:generic/ncurses@6.6.20251230") == ["manifest-analysis", "binary-analysis"]
                    and comps.get("pkg:generic/llvm@23.0.0git") == ["manifest-analysis", "binary-analysis"]
                    and len(zlib) == 1 and comps[zlib[0]] == ["binary-analysis"])
