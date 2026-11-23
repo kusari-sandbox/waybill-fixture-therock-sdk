@@ -36,13 +36,14 @@ import sys
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 EVENT = re.compile(r"path=(.*?) (hit|anchored|unanchored|curated_version_change)=(\{.*\})\s*$")
-PATHLESS = re.compile(r" (shared_file|cpe_form_change)=(\{.*\})\s*$")
+PATHLESS = re.compile(r" (shared_file|cpe_form_change|technique_change|binary_derived_kind|binary_merge)=(\{.*\})\s*$")
 NAMES = {"bzip2", "gmp", "liblzma", "xz", "lzma"}
 
 
 def events(log_path):
     out = {"hit": [], "anchored": [], "unanchored": [], "curated_version_change": [],
-           "shared_file": [], "cpe_form_change": []}
+           "shared_file": [], "cpe_form_change": [], "technique_change": [],
+           "binary_derived_kind": [], "binary_merge": []}
     with open(log_path, encoding="utf-8", errors="replace") as f:
         for line in f:
             line = ANSI.sub("", line)
@@ -130,6 +131,9 @@ def main():
         "curated_version_change": evs["curated_version_change"],
         "shared_file": evs["shared_file"],
         "cpe_form_change": evs["cpe_form_change"],
+        "technique_change": evs["technique_change"],
+        "binary_derived_kind": evs["binary_derived_kind"],
+        "binary_merge": evs["binary_merge"],
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, sort_keys=True)
@@ -189,6 +193,24 @@ def main():
     print(f"\n**ncurses CPE form changes (FR-008):** {len(cf)}")
     for c in sorted(cf, key=lambda c: c["purl"]):
         print(f"- `{c['purl']}`: `{c['old']}` -> `{c['new']}`")
+
+    # Spec 1646 (waybill #1665): binary-match evidence.
+    tc = evs["technique_change"]
+    print(f"\n### Binary-match evidence (spec 1646)\n\n**Technique changes (FR-003):** {len(tc)} events, "
+          f"{len({c['purl'] for c in tc})} PURLs")
+    for k, n in sorted(collections.Counter(c["evidence_kind"] for c in tc).items()):
+        print(f"- {k}: {n}")
+    bd = evs["binary_derived_kind"]
+    print(f"\n**Other binary-derived kinds (follow-up):** {len(bd)} events")
+    for k, n in sorted(collections.Counter(c["evidence_kind"] for c in bd).items()):
+        print(f"- {k}: {n} events, {len({c['purl'] for c in bd if c['evidence_kind'] == k})} PURLs")
+    bm = evs["binary_merge"]
+    with_record = sorted({m["purl"] for m in bm if m["winner"]["mechanism"] or m["loser"]["mechanism"]})
+    print(f"\n**Binary merges (FR-002):** {len(bm)} events; {len(with_record)} PURLs merged with a record")
+    for m in sorted(bm, key=lambda m: (m["purl"], m["site"])):
+        w, l = m["winner"], m["loser"]
+        print(f"- `{m['purl']}` {m['site']}: winner {w['mechanism'] or w['evidence_kind']} / loser "
+              f"{l['mechanism'] or l['evidence_kind']}; absorbed {m['absorbed']}")
 
 
 if __name__ == "__main__":

@@ -22,6 +22,8 @@ installed-library tree there, the shape of waybill's
                                      the LLVM suffix is kept (FR-002)
   lib/libncurses.so.6 (no banner) + lib/pkgconfig/ncurses.pc 6.4.20221231
                                      an ncurses CPE whose form changes
+  lib/libwaybill-fixture-z.so.1      zlib's exported symbols alone, a
+                                     fingerprint match (spec 1646)
 
 usage: anchored_control.py OUT_DIR [IDENTITY_DIR]
 """
@@ -100,6 +102,11 @@ def identity(out, lead):
         "lib/cmake/llvm/LLVMConfigVersion.cmake": b'set(PACKAGE_VERSION "23.0.0git")\n',
         "lib/libncurses.so.6": elf(lead),
         "lib/pkgconfig/ncurses.pc": b"Version: 6.4.20221231\n",
+        # Spec 1646 (waybill #1665): a symbol fingerprint alone (zlib's
+        # bundled fingerprint, 8 of 10 required).
+        "lib/libwaybill-fixture-z.so.1": elf(lead, defined=[
+            "deflate", "inflate", "deflateInit_", "inflateInit_", "deflateEnd",
+            "inflateEnd", "crc32", "adler32", "compress", "uncompress"]),
     }
     for n, b in files.items():
         p = os.path.join(out, n)

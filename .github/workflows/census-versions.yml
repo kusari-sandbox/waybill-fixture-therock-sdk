@@ -114,6 +114,31 @@ jobs:
               sys.exit(f"identity control failed: {shared} {changes} {cpes}")
           print("identity control ok:", shared, changes, cpes)
           PY
+          # Spec 1646 (waybill #1665): log-only, the census reports the two
+          # merges and three technique changes; wired, the events are gone
+          # and the document carries binary-analysis instead.
+          python3 -I -B - out/versions-identity.json out/scan-identity.cdx.json <<'PY'
+          import json, sys
+          r = json.load(open(sys.argv[1])); doc = json.load(open(sys.argv[2]))
+          stack, comps = list(doc.get("components", [])), {}
+          while stack:
+              c = stack.pop(); stack.extend(c.get("components", []))
+              if c.get("purl"):
+                  comps[c["purl"].split("?")[0]] = [m["technique"] for i in c.get("evidence", {}).get("identity", []) for m in i.get("methods", [])]
+          merged = sorted({m["purl"] for m in r["binary_merge"] if m["winner"]["mechanism"] or m["loser"]["mechanism"]})
+          changed = sorted({c["purl"] for c in r["technique_change"]})
+          zlib = [p for p in comps if p.startswith("pkg:generic/zlib")]
+          log_only = (merged == ["pkg:generic/llvm@23.0.0git", "pkg:generic/ncurses@6.6.20251230"]
+                      and changed == sorted(["pkg:generic/llvm@23.0.0git", "pkg:generic/ncurses@6.6.20251230"] + zlib))
+          wired = (not r["binary_merge"] and not r["technique_change"]
+                   and comps.get("pkg:generic/ncurses@6.6.20251230") == ["manifest-analysis", "binary-analysis"]
+                   and comps.get("pkg:generic/llvm@23.0.0git") == ["manifest-analysis", "binary-analysis"]
+                   and len(zlib) == 1 and comps[zlib[0]] == ["binary-analysis"])
+          if not (log_only or wired):
+              sys.exit(f"spec 1646 control failed: merged={merged} changed={changed} zlib={zlib} "
+                       f"methods={ {p: comps.get(p) for p in ['pkg:generic/ncurses@6.6.20251230', 'pkg:generic/llvm@23.0.0git'] + zlib} }")
+          print("spec 1646 control ok:", "log-only" if log_only else "wired", merged, changed)
+          PY
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
