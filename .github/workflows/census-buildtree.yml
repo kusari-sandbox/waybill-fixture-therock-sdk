@@ -1,0 +1,117 @@
+name: census-buildtree
+
+# waybill spec 1652, SC-001(b) / task T001: capture a real TheRock build tree.
+# Configures TheRock with every optional component off, builds a small set of
+# subproject targets (third-party libraries fetched through
+# therock_subproject_fetch, which is an ExternalProject_Add with a moved
+# PREFIX), and uploads the build tree's listing plus the metadata files
+# waybill would read: CMakeCache.txt, compile_commands.json, file-API replies,
+# and the NAMES of every *-stamp file. It reads no info files' contents into
+# the summary. Same output shape as specs/1652-cmake-build-tree/measurements/
+# probe/inner.sh, so the probe's analyze.py questions can be asked of it.
+# TheRock is cloned here, in CI only -- never locally.
+
+on:
+  push:
+    branches: [census-buildtree]
+  workflow_dispatch:
+    inputs:
+      therock_ref:
+        description: "TheRock commit"
+        type: string
+        default: b1cae390cc745283dce25581415353f9bc906162
+      targets:
+        description: "build targets (space separated); failures are kept going (-k 0)"
+        type: string
+        default: "therock-fmt therock-nlohmann-json therock-yaml-cpp therock-googletest"
+
+permissions:
+  contents: read
+
+env:
+  THEROCK_REF: ${{ inputs.therock_ref || 'b1cae390cc745283dce25581415353f9bc906162' }}
+  TARGETS: ${{ inputs.targets || 'therock-fmt therock-nlohmann-json therock-yaml-cpp therock-googletest' }}
+
+jobs:
+  census:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Free disk
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h / | tee disk.txt
+
+      - name: Toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gfortran git ninja-build cmake g++ pkg-config xxd automake \
+            libtool python3-venv python3-dev libegl1-mesa-dev texinfo bison flex patchelf
+          { cmake --version | head -1; ninja --version; g++ --version | head -1; } | tee versions.txt
+
+      - name: Clone TheRock (fork) with top-level submodules
+        run: |
+          set -euo pipefail
+          git init -q therock
+          git -C therock remote add origin https://github.com/kusari-sandbox/TheRock
+          git -C therock fetch -q --depth 1 origin "$THEROCK_REF"
+          git -C therock checkout -q FETCH_HEAD
+          git -C therock submodule update --init --depth 1 --jobs 8
+          echo "therock $(git -C therock rev-parse HEAD)" | tee -a versions.txt
+          python3 -m venv venv && venv/bin/pip install -q -r therock/requirements.txt
+
+      - name: Configure
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          rc=0
+          PATH="$PWD/venv/bin:$PATH" cmake -S therock -B therock/build -GNinja \
+            -DTHEROCK_ENABLE_ALL=OFF -DTHEROCK_ENABLE_CORE=OFF \
+            -DTHEROCK_AMDGPU_FAMILIES=gfx1150 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            > out/configure.log 2>&1 || rc=$?
+          echo "configure=$rc" | tee out/runs.txt
+          tail -40 out/configure.log
+          ninja -C therock/build -t targets all 2>/dev/null | grep -oE '^therock-[^:+ ]+' | sort -u > out/therock-targets.txt || true
+          wc -l out/therock-targets.txt
+
+      - name: Build targets (keep going)
+        run: |
+          set -euo pipefail
+          rc=0
+          start=$(date +%s)
+          PATH="$PWD/venv/bin:$PATH" ninja -C therock/build -k 0 $TARGETS > out/build.log 2>&1 || rc=$?
+          echo "build=$rc seconds=$(( $(date +%s) - start ))" | tee -a out/runs.txt
+          tail -40 out/build.log
+          df -h / | tee -a disk.txt
+
+      - name: Collect build-tree metadata
+        run: |
+          set -euo pipefail
+          b=therock/build
+          (cd "$b" && find . -printf '%y\t%s\t%p\n' | sort -k3) | gzip > out/listing.tsv.gz
+          (cd "$b" && find . -name CMakeCache.txt -printf '%h\n' | sort) > out/cache-dirs.txt
+          (cd "$b" && find . \( -name '*-download' -o -name '*-mkdir' -o -name '*-done' \) -path '*-stamp/*' -printf '%p\n' | sort) > out/stamps.txt
+          (cd "$b" && find . -type d -path '*/_deps/*-src' -printf '%p\n' | sort) > out/deps-src.txt
+          mkdir -p out/meta
+          (cd "$b" && find . \( -name CMakeCache.txt -o -name compile_commands.json \
+               -o -name 'compile_commands_fragment_*.json' -o -path '*/.cmake/api/v1/reply/*' \) \
+               -type f -size -20M -exec cp --parents {} "$GITHUB_WORKSPACE/out/meta/" \;)
+          cp versions.txt disk.txt out/
+          {
+            echo "## census-buildtree"
+            echo '```'; cat out/versions.txt out/runs.txt; echo '```'
+            echo "- build directories with CMakeCache.txt: $(wc -l < out/cache-dirs.txt)"
+            echo "- *-stamp step files (download/mkdir/done): $(wc -l < out/stamps.txt)"
+            echo "- _deps/*-src populations: $(wc -l < out/deps-src.txt)"
+            echo "- compile_commands*.json files: $(find out/meta -name 'compile_commands*.json' | wc -l)"
+            echo "- listing entries: $(zcat out/listing.tsv.gz | wc -l)"
+            echo "- metadata kept: $(du -sh out/meta | cut -f1)"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: census-buildtree
+          path: out/
